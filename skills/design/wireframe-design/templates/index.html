@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PJ名 — ワイヤーフレーム一覧</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- アイコン: Iconify。<iconify-icon icon="lucide:..."> で使う。色/サイズは Tailwind の text-* が効く。 -->
+  <script src="https://cdn.jsdelivr.net/npm/iconify-icon@2/dist/iconify-icon.min.js"></script>
+  <style>
+    body { font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; }
+    .note { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  </style>
+</head>
+<body class="bg-neutral-200 text-neutral-800 p-8">
+
+  <!-- 入口: 全ワイヤーへのリンクを1か所に集約する -->
+  <header class="mb-8 max-w-2xl mx-auto">
+    <h1 class="text-2xl font-bold">PJ名 — ワイヤーフレーム</h1>
+    <p class="text-sm text-neutral-600 mt-1">
+      低忠実度。配色・タイポは未確定で、構造と要素の有無のみを示す。
+    </p>
+  </header>
+
+  <main class="max-w-2xl mx-auto">
+    <ul class="space-y-3">
+      <!-- 画面ごとに1行。状態違いは別行で並べてよい（例: 本棚(本あり)/本棚(空)） -->
+      <li>
+        <a href="01-screen-a.html" class="flex items-center gap-3 bg-white rounded-xl px-5 py-4 shadow hover:shadow-md transition-shadow">
+          <span class="text-lg font-bold text-neutral-400 w-6">①</span>
+          <span class="font-medium">画面A</span>
+          <span class="text-xs text-neutral-400 ml-auto note">01-screen-a.html</span>
+        </a>
+      </li>
+      <li>
+        <a href="02-next-screen.html" class="flex items-center gap-3 bg-white rounded-xl px-5 py-4 shadow hover:shadow-md transition-shadow">
+          <span class="text-lg font-bold text-neutral-400 w-6">②</span>
+          <span class="font-medium">画面B</span>
+          <span class="text-xs text-neutral-400 ml-auto note">02-next-screen.html</span>
+        </a>
+      </li>
+    </ul>
+  </main>
+
+</body>
+</html>
