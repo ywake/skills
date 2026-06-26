@@ -54,6 +54,7 @@ gh skill preview ywake/skills wireframe-design
 ## 管理
 
 ```sh
-gh skill list             # 導入済みスキル一覧
-gh skill update --all     # まとめて更新
+gh skill list                                    # 導入済みスキル一覧
+gh skill update ywake/skills wireframe-design     # スキルを1つだけ更新
+gh skill update --all                            # まとめて更新
 ```
