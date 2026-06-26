@@ -34,6 +34,8 @@
        例: 通常 / 空 / 失敗 を3フレーム。要素レベル状態（入力エラー・モーダル）は1フレーム内で表現する。 -->
   <div class="flex flex-wrap gap-10 justify-center items-start max-w-7xl mx-auto">
     <section>
+      <!-- 枠は W×H 固定の箱。flex-1/w-full で潰さない・高さを中身任せにしない。
+           中身は下の flex-1 overflow-y-auto で「枠の中だけ」スクロールさせる。 -->
       <div class="device-phone relative bg-white border-neutral-800 shadow-xl overflow-hidden flex flex-col">
 
         <!-- ステータスバー（雰囲気確認用。実装では OS のものに置き換わる） -->
