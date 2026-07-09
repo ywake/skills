@@ -600,3 +600,65 @@
 ```
 
 **デザインポイント**: 引用符は `text-brand-teal` の1色だけをアクセントに使う。本文は `italic text-gray-800` で読みやすさを保ちつつ引用らしさを出し、出典は `text-em-sm text-gray-500` に沈めて主従関係を明確にする。
+
+## E. 背景/画像
+
+### E-1 全面画像＋オーバーレイ
+
+**用途**: 表紙・章扉でビジュアルを強く出す。
+
+```markdown
+![bg](images/cover.jpg)
+
+<div class="h-full flex flex-col justify-end p-16 bg-black/40 text-white">
+  <h1 class="text-em-2xl font-bold">プロダクトの全体像</h1>
+  <p class="text-em-lg opacity-90">2026 年の到達点</p>
+</div>
+```
+
+**デザインポイント**: 画像は `images/` 配下に置き、パスは `images/cover.jpg` のように相対指定する。レンダリングには `--allow-local-files` フラグが必須。可読性のため必ず半透明オーバーレイ（`bg-black/40` 等）を敷く。前景テキストは白＋ `opacity` で階層化する。
+
+### E-2 左右分割bg
+
+**用途**: 事例・実績など、写真とテキストを対で見せたいとき。
+
+```markdown
+![bg left](images/side.jpg)
+
+<div class="h-full flex flex-col justify-center gap-4 px-12">
+  <span class="text-em-sm tracking-widest text-brand-teal">CASE STUDY</span>
+  <h2 class="text-em-xl font-bold text-gray-900">新工場の稼働開始</h2>
+  <p class="text-em-base text-gray-700">最新設備の導入により生産効率を高め、供給体制を強化する。</p>
+</div>
+```
+
+**デザインポイント**: `![bg left]` を使うと画像がスライド左半分を占め、右半分は通常のコンテンツ領域として扱える（`![bg right]` で左右を反転できる）。アクセントは `text-brand-teal` のラベル1色のみに絞る。画像は `images/side.jpg` のように相対パスで配置し、`--allow-local-files` を忘れない。
+
+### E-3 グラデ背景セクション
+
+**用途**: 実績・数値のハイライトを、画像を使わずに強い印象で見せたいとき。
+
+```markdown
+<div class="h-full w-full flex flex-col justify-center gap-6 px-20 bg-gradient-to-br from-brand-navy to-brand-teal text-white">
+  <span class="text-em-sm tracking-widest opacity-80">FISCAL YEAR 2026</span>
+  <h2 class="text-em-2xl font-bold">売上成長率 148%</h2>
+  <p class="text-em-lg text-white/90">新規顧客獲得とアップセルの両輪で過去最高の成長を達成した</p>
+</div>
+```
+
+**デザインポイント**: A-2 のグラデーション扉と同じ `from-brand-navy to-brand-teal` を用い、配色の一貫性を保つ。写真素材を用意できないときの代替として使える。ラベルは `opacity-80`、本文は `text-white/90` で階層をつけ、白1色の中で濃淡だけを変える。
+
+### E-4 背景アニメ（GIF）
+
+**用途**: 継続的な取り組みやサイクルを、動きのある背景で印象づけたいとき。
+
+```markdown
+![bg](images/loop.gif)
+
+<div class="h-full flex flex-col items-center justify-center gap-4 bg-black/50 text-white text-center">
+  <h2 class="text-em-2xl font-bold">止まらないリリースサイクル</h2>
+  <p class="text-em-base opacity-90">計測と改善を毎日繰り返す運用体制</p>
+</div>
+```
+
+**デザインポイント**: GIF も静止画と同じく `images/` 配下に置き、`![bg](images/loop.gif)` という通常の画像と同一の書き方で背景に敷ける。PNG で静止画検証する際はアニメーションの1フレームしか写らない点に注意し、実際の動きは Marp のプレビューやブラウザ表示で確認する。前景は E-1 と同じく半透明オーバーレイ（`bg-black/50`）を重ねて可読性を確保する。
