@@ -52,8 +52,10 @@ mkdir -p slides images svg docs
 
 ## 5. スタイルガイド生成
 
+このスキルのインストール先ディレクトリから `style-guide-template.md` をプロジェクトにコピーします。`<skill-dir>` は実際のインストール先パス（例：`~/.claude/skills/marp-slides`）に置き替えてください。
+
 ```bash
-cp skills/slides/marp-slides/references/style-guide-template.md docs/style-guide.md
+cp <skill-dir>/references/style-guide-template.md docs/style-guide.md
 ```
 
 `style-guide-template.md` を `docs/style-guide.md` としてプロジェクトにコピーし、ブランド色（`brand.navy` / `brand.teal` / `brand.ruby` 相当の値）をプロジェクト指定の色に差し替える。以降のデッキ作成はこの `docs/style-guide.md` を参照して色・タイポの一貫性を保つ。
