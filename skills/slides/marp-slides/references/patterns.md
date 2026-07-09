@@ -353,3 +353,250 @@
 ```
 
 **デザインポイント**: `grid-cols-3` で左を `col-span-2` にし、本文主体の左と要約サイドバーの右で役割を分ける。右サイドバーの箇条書きは `text-em-sm` に下げて密度を高め、アクセントは navy の見出し1色のみに絞る。
+
+## C. 縦リスト
+
+### C-1 番号ステップ
+
+**用途**: 手順・段階的な流れ（3〜4ステップ）を示す。
+
+```markdown
+<div class="h-full flex flex-col justify-center gap-4 px-16">
+  <div class="flex items-start gap-4">
+    <div class="shrink-0 w-12 h-12 rounded-full bg-brand-navy text-white flex items-center justify-center text-em-xl font-bold">1</div>
+    <div>
+      <h3 class="text-em-xl font-semibold text-gray-800">要件を洗い出す</h3>
+      <p class="text-em-base text-gray-600">関係者へのヒアリングで前提を固める。</p>
+    </div>
+  </div>
+  <div class="flex items-start gap-4">
+    <div class="shrink-0 w-12 h-12 rounded-full bg-brand-navy text-white flex items-center justify-center text-em-xl font-bold">2</div>
+    <div>
+      <h3 class="text-em-xl font-semibold text-gray-800">設計案をまとめる</h3>
+      <p class="text-em-base text-gray-600">制約条件を踏まえて複数案を比較検討する。</p>
+    </div>
+  </div>
+  <div class="flex items-start gap-4">
+    <div class="shrink-0 w-12 h-12 rounded-full bg-brand-navy text-white flex items-center justify-center text-em-xl font-bold">3</div>
+    <div>
+      <h3 class="text-em-xl font-semibold text-gray-800">合意を得て着手する</h3>
+      <p class="text-em-base text-gray-600">レビューを経て、実装フェーズへ移行する。</p>
+    </div>
+  </div>
+</div>
+```
+
+**デザインポイント**: 番号バッジは `bg-brand-navy` の塗りで統一し、数字は `text-em-xl font-bold` で視認性を確保する。縦に5項目以上入れない（超えたら2列グリッドに切替える）。
+
+### C-2 アイコン付きパネル箇条書き
+
+**用途**: 複数の要点を等価に並べて示したいとき、各項目をパネル化して視認性を高める。
+
+```markdown
+<div class="h-full flex flex-col justify-center gap-3 px-16">
+  <div class="flex items-center gap-4 bg-gray-50 rounded-lg p-4">
+    <div class="shrink-0 w-10 h-10 rounded-lg bg-brand-navy text-white flex items-center justify-center text-em-lg font-bold">◆</div>
+    <p class="text-em-base text-gray-700">既存システムとの互換性を維持する。</p>
+  </div>
+  <div class="flex items-center gap-4 bg-gray-50 rounded-lg p-4">
+    <div class="shrink-0 w-10 h-10 rounded-lg bg-brand-navy text-white flex items-center justify-center text-em-lg font-bold">◆</div>
+    <p class="text-em-base text-gray-700">導入コストを最小限に抑える。</p>
+  </div>
+  <div class="flex items-center gap-4 bg-gray-50 rounded-lg p-4">
+    <div class="shrink-0 w-10 h-10 rounded-lg bg-brand-navy text-white flex items-center justify-center text-em-lg font-bold">◆</div>
+    <p class="text-em-base text-gray-700">運用チームの負担を増やさない。</p>
+  </div>
+  <div class="flex items-center gap-4 bg-gray-50 rounded-lg p-4">
+    <div class="shrink-0 w-10 h-10 rounded-lg bg-brand-navy text-white flex items-center justify-center text-em-lg font-bold">◆</div>
+    <p class="text-em-base text-gray-700">将来の拡張余地を残しておく。</p>
+  </div>
+</div>
+```
+
+**デザインポイント**: アイコンは `bg-brand-navy` の角丸正方形に統一し、記号1文字（◆など）に留めて装飾過多を避ける。背景は `bg-gray-50` のみとし、縦に5項目以上入れない（超えたら2列グリッドに切替える）。
+
+### C-3 縦タイムライン
+
+**用途**: 日付や工程を時系列で並べ、経過と到達点を視覚的に示す。
+
+```markdown
+<div class="h-full flex flex-col justify-center gap-1 px-20">
+  <div class="flex gap-4">
+    <div class="flex flex-col items-center">
+      <div class="w-3 h-3 rounded-full bg-brand-navy shrink-0"></div>
+      <div class="w-px flex-1 bg-gray-200 mt-1"></div>
+    </div>
+    <div class="pb-6">
+      <span class="text-em-sm text-gray-500">2024年4月</span>
+      <h3 class="text-em-lg font-bold text-gray-900">要件定義フェーズ開始</h3>
+    </div>
+  </div>
+  <div class="flex gap-4">
+    <div class="flex flex-col items-center">
+      <div class="w-3 h-3 rounded-full bg-brand-navy shrink-0"></div>
+      <div class="w-px flex-1 bg-gray-200 mt-1"></div>
+    </div>
+    <div class="pb-6">
+      <span class="text-em-sm text-gray-500">2024年8月</span>
+      <h3 class="text-em-lg font-bold text-gray-900">基本設計を完了</h3>
+    </div>
+  </div>
+  <div class="flex gap-4">
+    <div class="flex flex-col items-center">
+      <div class="w-3 h-3 rounded-full bg-brand-navy shrink-0"></div>
+    </div>
+    <div>
+      <span class="text-em-sm text-gray-500">2025年1月</span>
+      <h3 class="text-em-lg font-bold text-gray-900">本番リリース</h3>
+    </div>
+  </div>
+</div>
+```
+
+**デザインポイント**: 最後の項目だけ縦線（`w-px flex-1 bg-gray-200`）を省き、終端であることを示す。ドットは `bg-brand-navy` の1色に統一し、日付ラベルは `text-em-sm text-gray-500` で控えめに添える。縦に5項目以上入れない（超えたら2列グリッドに切替える）。
+
+### C-4 Before→After 対応
+
+**用途**: 施策実施前後の変化を左右で対比させ、効果を直感的に伝える。
+
+```markdown
+<div class="h-full flex flex-col justify-center gap-4 px-16">
+  <div class="grid grid-cols-[1fr_auto_1fr] gap-4 px-1">
+    <span class="text-em-sm tracking-widest text-gray-400">BEFORE</span>
+    <span></span>
+    <span class="text-em-sm tracking-widest text-brand-teal">AFTER</span>
+  </div>
+  <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+    <div class="bg-gray-50 rounded-lg px-5 py-3 text-em-base text-gray-500">月次で手作業集計</div>
+    <span class="text-em-lg text-brand-teal">→</span>
+    <div class="bg-gray-50 rounded-lg px-5 py-3 text-em-base font-semibold text-gray-900">日次で自動集計</div>
+  </div>
+  <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+    <div class="bg-gray-50 rounded-lg px-5 py-3 text-em-base text-gray-500">担当者ごとに手順が異なる</div>
+    <span class="text-em-lg text-brand-teal">→</span>
+    <div class="bg-gray-50 rounded-lg px-5 py-3 text-em-base font-semibold text-gray-900">手順を標準化して共有</div>
+  </div>
+  <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+    <div class="bg-gray-50 rounded-lg px-5 py-3 text-em-base text-gray-500">障害対応に半日かかる</div>
+    <span class="text-em-lg text-brand-teal">→</span>
+    <div class="bg-gray-50 rounded-lg px-5 py-3 text-em-base font-semibold text-gray-900">30分以内に一次対応</div>
+  </div>
+</div>
+```
+
+**デザインポイント**: `grid-cols-[1fr_auto_1fr]` で左右のカードと中央の矢印を揃え、矢印は `text-brand-teal` の1色のみで強調する。BEFORE 側は `text-gray-500` に沈め、AFTER 側は `font-semibold text-gray-900` として変化後を主役にする。縦に5項目以上入れない（超えたら2列グリッドに切替える）。
+
+### C-5 チェックリスト
+
+**用途**: 完了条件やリリース判定など、満たすべき項目を列挙する。
+
+```markdown
+<div class="h-full flex flex-col justify-center gap-3 px-16">
+  <div class="flex items-center gap-4">
+    <div class="shrink-0 w-8 h-8 rounded-full bg-brand-teal text-white flex items-center justify-center text-em-base font-bold">✓</div>
+    <p class="text-em-lg text-gray-800">要件定義書のレビューが完了している</p>
+  </div>
+  <div class="flex items-center gap-4">
+    <div class="shrink-0 w-8 h-8 rounded-full bg-brand-teal text-white flex items-center justify-center text-em-base font-bold">✓</div>
+    <p class="text-em-lg text-gray-800">セキュリティ診断で指摘事項がない</p>
+  </div>
+  <div class="flex items-center gap-4">
+    <div class="shrink-0 w-8 h-8 rounded-full bg-brand-teal text-white flex items-center justify-center text-em-base font-bold">✓</div>
+    <p class="text-em-lg text-gray-800">運用手順書が最新化されている</p>
+  </div>
+  <div class="flex items-center gap-4">
+    <div class="shrink-0 w-8 h-8 rounded-full bg-brand-teal text-white flex items-center justify-center text-em-base font-bold">✓</div>
+    <p class="text-em-lg text-gray-800">ロールバック手順を確認済みである</p>
+  </div>
+</div>
+```
+
+**デザインポイント**: バッジは `bg-brand-teal` の円形に `✓` の記号1文字のみを置き、装飾的な絵文字は使わない。縦に5項目以上入れない（超えたら2列グリッドに切替える）。
+
+## D. パネル
+
+### D-1 白カード＋シャドウ
+
+**用途**: 本文の一部を白背景カードで区切り、注目を集めたい情報を独立させる。
+
+```markdown
+<div class="h-full flex items-center justify-center bg-gray-50 px-16">
+  <div class="bg-white rounded-2xl shadow-xl p-10 flex flex-col gap-3 max-w-xl">
+    <h3 class="text-em-xl font-bold text-gray-900">新契約プランのご案内</h3>
+    <p class="text-em-base text-gray-700">利用量に応じた従量課金と、主要機能を含む定額プランを組み合わせ、無駄のない料金体系を実現する。</p>
+  </div>
+</div>
+```
+
+**デザインポイント**: スライド全体の背景を `bg-gray-50` にして `shadow-xl` の白カードを浮き上がらせる。アクセント色は使わず `gray-900`/`gray-700` の濃淡のみで完結させる。
+
+### D-2 ガラス風
+
+**用途**: グラデーション背景の上に半透明パネルを重ね、洗練された印象を与えたいとき。
+
+```markdown
+<div class="h-full relative flex items-center justify-center overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-br from-brand-navy to-brand-teal"></div>
+  <div class="absolute -left-10 -top-10 w-72 h-72 rounded-full bg-white/20"></div>
+  <div class="absolute -right-16 -bottom-16 w-80 h-80 rounded-full bg-white/10"></div>
+  <div class="relative bg-white/20 backdrop-blur-md rounded-2xl p-10 flex flex-col gap-3 max-w-xl border border-solid border-white/30">
+    <h3 class="text-em-xl font-bold text-white">次世代プラットフォーム</h3>
+    <p class="text-em-base text-white/90">クラウドネイティブな構成で、拡張性と運用効率を両立する。</p>
+  </div>
+</div>
+```
+
+**デザインポイント**: `bg-white/20 backdrop-blur-md` の効果は、必ず色のあるグラデーションや装飾円などの背景要素の上に重ねて使う。単色/白背景の上では透過がほぼ見えず成立しない。`preflight: false` の環境では `border-*` の幅・色ユーティリティだけでは枠線が描画されないため、`border-solid` を明示的に併用する。
+
+### D-3 グラデパネル
+
+**用途**: 重要な洞察や結論を、周囲から視覚的に切り離して強調する。
+
+```markdown
+<div class="h-full flex items-center justify-center px-16">
+  <div class="bg-gradient-to-br from-brand-navy to-brand-teal rounded-2xl p-10 flex flex-col gap-3 text-white w-full">
+    <span class="text-em-sm tracking-widest opacity-80">KEY INSIGHT</span>
+    <h3 class="text-em-xl font-bold">データ活用が競争優位の源泉になる</h3>
+    <p class="text-em-base text-white/90">意思決定のスピードと精度を高め、他社との差別化につなげる。</p>
+  </div>
+</div>
+```
+
+**デザインポイント**: `from-brand-navy to-brand-teal` のグラデーションはこのパネル1枚に限定し、他の要素と重複させない。見出し前の短いラベル（`text-em-sm tracking-widest opacity-80`）で文脈を添える。
+
+### D-4 左ボーダー強調
+
+**用途**: 前提条件・制約事項など、複数の短い項目を区切って並べる。
+
+```markdown
+<div class="h-full flex flex-col justify-center gap-6 px-16">
+  <div class="border-solid border-l-4 border-brand-teal pl-6 py-2">
+    <h3 class="text-em-lg font-bold text-gray-900">前提条件</h3>
+    <p class="text-em-base text-gray-700">既存システムのAPIを変更せずに新基盤を追加する。</p>
+  </div>
+  <div class="border-solid border-l-4 border-brand-teal pl-6 py-2">
+    <h3 class="text-em-lg font-bold text-gray-900">制約事項</h3>
+    <p class="text-em-base text-gray-700">移行期間中もサービスを停止させない。</p>
+  </div>
+  <div class="border-solid border-l-4 border-brand-teal pl-6 py-2">
+    <h3 class="text-em-lg font-bold text-gray-900">留意点</h3>
+    <p class="text-em-base text-gray-700">関係部署への周知を移行の2週間前までに終える。</p>
+  </div>
+</div>
+```
+
+**デザインポイント**: `border-l-4 border-brand-teal` は、`preflight: false` の環境では幅・色のユーティリティだけでは枠線が描画されないため、必ず `border-solid` を併用する。縦に5項目以上入れない（超えたら2列グリッドに切替える）。
+
+### D-5 引用コールアウト
+
+**用途**: 社内標準や第三者の言葉を引用し、主張に権威づけを行いたいとき。
+
+```markdown
+<div class="h-full flex flex-col items-center justify-center gap-4 px-24 text-center">
+  <span class="text-em-2xl text-brand-teal leading-none">&ldquo;</span>
+  <p class="text-em-xl italic text-gray-800 leading-relaxed">最良の設計とは、変更コストを最小化する設計である</p>
+  <p class="text-em-sm text-gray-500">ー 社内アーキテクチャ標準ガイドライン</p>
+</div>
+```
+
+**デザインポイント**: 引用符は `text-brand-teal` の1色だけをアクセントに使う。本文は `italic text-gray-800` で読みやすさを保ちつつ引用らしさを出し、出典は `text-em-sm text-gray-500` に沈めて主従関係を明確にする。
