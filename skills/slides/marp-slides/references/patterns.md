@@ -662,3 +662,255 @@
 ```
 
 **デザインポイント**: GIF も静止画と同じく `images/` 配下に置き、`![bg](images/loop.gif)` という通常の画像と同一の書き方で背景に敷ける。PNG で静止画検証する際はアニメーションの1フレームしか写らない点に注意し、実際の動きは Marp のプレビューやブラウザ表示で確認する。前景は E-1 と同じく半透明オーバーレイ（`bg-black/50`）を重ねて可読性を確保する。
+
+## G. 応用
+
+### G-1 QR誘導
+
+**用途**: 資料末尾や CTA スライドで、QR コードから外部リンク（アンケート・申込・資料 DL など）へ誘導する。
+
+```markdown
+<div class="h-full flex flex-col items-center justify-center gap-8">
+  <div class="w-40 h-40 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-em-base text-gray-400">QR</div>
+  <div class="flex flex-col items-center gap-2 text-center">
+    <h3 class="text-em-xl font-bold text-gray-900">アンケートにご協力ください</h3>
+    <p class="text-em-base text-gray-600">スマートフォンで QR コードを読み取り、3分ほどで回答できます</p>
+  </div>
+</div>
+```
+
+**デザインポイント**: A-5 と同じ破線プレースホルダ規約で QR 画像枠を実装し、後から本物の QR 画像に差し替えられるようにする。視線を QR に集めるためアクセント色は使わずグレースケール中心にする。
+
+### G-2 事例紹介
+
+**用途**: 導入事例をロゴ・概要・成果数値とともに簡潔に紹介する。
+
+```markdown
+<div class="h-full flex flex-col justify-center gap-8 px-16">
+  <div class="w-40 h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-em-sm text-gray-400">LOGO</div>
+  <div class="flex flex-col gap-2">
+    <h3 class="text-em-xl font-bold text-gray-900">株式会社サンプル様</h3>
+    <p class="text-em-base text-gray-700">在庫管理システムの刷新により、月次棚卸しにかかる作業工数を削減した。</p>
+  </div>
+  <div class="flex items-end gap-2">
+    <span class="text-em-2xl font-bold text-brand-navy leading-none">70</span>
+    <span class="text-em-lg font-bold text-brand-navy leading-none">%</span>
+    <span class="text-em-base text-gray-600">棚卸し工数を削減</span>
+  </div>
+</div>
+```
+
+**デザインポイント**: ロゴ枠は A-5 / B-2 と同じ破線プレースホルダ規約で実装し、後から画像に差し替える。成果数値は F-1 の数値強調規約を踏襲し、単位は本数値よりワンランク小さいサイズにして brand-navy 一色でまとめる。
+
+### G-3 比較表
+
+**用途**: 自社と他社、複数プランなど複数項目を表形式で比較する。
+
+```markdown
+<div class="h-full flex flex-col justify-center px-16">
+  <table class="w-full border-collapse text-em-base">
+    <thead>
+      <tr>
+        <th class="text-left font-bold px-4 py-3 bg-brand-navy text-white rounded-l-lg">比較項目</th>
+        <th class="text-left font-bold px-4 py-3 bg-brand-navy text-white">自社プラン</th>
+        <th class="text-left font-bold px-4 py-3 bg-brand-navy text-white rounded-r-lg">他社プラン</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="px-4 py-3 border-b border-gray-200 text-gray-700">初期費用</td>
+        <td class="px-4 py-3 border-b border-gray-200 font-semibold text-gray-900">0円</td>
+        <td class="px-4 py-3 border-b border-gray-200 text-gray-500">10万円〜</td>
+      </tr>
+      <tr>
+        <td class="px-4 py-3 border-b border-gray-200 text-gray-700">サポート体制</td>
+        <td class="px-4 py-3 border-b border-gray-200 font-semibold text-gray-900">24時間365日</td>
+        <td class="px-4 py-3 border-b border-gray-200 text-gray-500">平日9時から18時</td>
+      </tr>
+      <tr>
+        <td class="px-4 py-3 text-gray-700">契約期間</td>
+        <td class="px-4 py-3 font-semibold text-gray-900">1か月単位</td>
+        <td class="px-4 py-3 text-gray-500">1年単位</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+```
+
+**デザインポイント**: ヘッダー行のみ `bg-brand-navy` で塗り、本文は `text-gray-900`（自社側の強調）と `text-gray-500`（比較対象）で書き分けて視線を誘導する。border は行単位ではなくセル単位（`td` に直接 `border-b border-gray-200`）で指定し、marp-core 既定のテーマ表スタイルより確実に優先させる。列数・行数を増やしすぎるとはみ出すため、3列前後・4行程度を目安にする。
+
+### G-4 横プロセスフロー
+
+**用途**: 導入までの流れや施策のステップを横方向のフローとして示す。
+
+```markdown
+<div class="h-full flex items-center justify-center gap-4 px-12">
+  <div class="flex-1 bg-gray-50 rounded-lg p-6 text-center">
+    <div class="text-em-xl font-bold text-brand-navy mb-2">01</div>
+    <div class="text-em-base text-gray-700">要件整理</div>
+  </div>
+  <div class="text-em-lg text-brand-teal">→</div>
+  <div class="flex-1 bg-gray-50 rounded-lg p-6 text-center">
+    <div class="text-em-xl font-bold text-brand-navy mb-2">02</div>
+    <div class="text-em-base text-gray-700">設計</div>
+  </div>
+  <div class="text-em-lg text-brand-teal">→</div>
+  <div class="flex-1 bg-gray-50 rounded-lg p-6 text-center">
+    <div class="text-em-xl font-bold text-brand-navy mb-2">03</div>
+    <div class="text-em-base text-gray-700">開発</div>
+  </div>
+  <div class="text-em-lg text-brand-teal">→</div>
+  <div class="flex-1 bg-gray-50 rounded-lg p-6 text-center">
+    <div class="text-em-xl font-bold text-brand-navy mb-2">04</div>
+    <div class="text-em-base text-gray-700">運用開始</div>
+  </div>
+</div>
+```
+
+**デザインポイント**: ステップ番号は B-3 と同じ brand-navy の太字ラベル、矢印は C-4 と同じ `text-brand-teal` の → で統一する。各ボックスは `flex-1` で均等幅にし、矢印は幅固定のテキストのままにして中央揃えを崩さない。ステップ数は横幅に収まる4つ程度を目安にする。
+
+### G-5 ロードマップ
+
+**用途**: 複数四半期・月にわたる計画を時間軸に沿った横帯で示す。
+
+```markdown
+<div class="h-full flex flex-col justify-center px-16">
+  <div class="flex items-center">
+    <div class="flex flex-col items-center gap-3">
+      <div class="text-em-sm text-gray-500">2026 Q1</div>
+      <div class="w-4 h-4 rounded-full bg-brand-navy"></div>
+    </div>
+    <div class="flex-1 h-px bg-gray-200"></div>
+    <div class="flex flex-col items-center gap-3">
+      <div class="text-em-sm text-gray-500">2026 Q2</div>
+      <div class="w-4 h-4 rounded-full bg-brand-navy"></div>
+    </div>
+    <div class="flex-1 h-px bg-gray-200"></div>
+    <div class="flex flex-col items-center gap-3">
+      <div class="text-em-sm text-gray-500">2026 Q3</div>
+      <div class="w-4 h-4 rounded-full bg-brand-teal"></div>
+    </div>
+    <div class="flex-1 h-px bg-gray-200"></div>
+    <div class="flex flex-col items-center gap-3">
+      <div class="text-em-sm text-gray-500">2026 Q4</div>
+      <div class="w-4 h-4 rounded-full bg-brand-teal"></div>
+    </div>
+  </div>
+  <div class="flex justify-between mt-4">
+    <div class="w-1/4 text-em-base text-gray-700 text-center">要件定義</div>
+    <div class="w-1/4 text-em-base text-gray-700 text-center">設計・開発</div>
+    <div class="w-1/4 text-em-base text-gray-700 text-center">試験導入</div>
+    <div class="w-1/4 text-em-base text-gray-700 text-center">全社展開</div>
+  </div>
+</div>
+```
+
+**デザインポイント**: C-3 の縦タイムラインの横方向版として、`flex-1 h-px bg-gray-200` の連結線の上にドットを並べる。直近フェーズは brand-navy、以降の見込みフェーズは brand-teal にして進捗の境目を示す（アクセントは2色まで）。日付ラベルは `text-em-sm text-gray-500` で C-3 のキャプションと表記を揃える。
+
+### G-6 チーム紹介
+
+**用途**: プロジェクトチームやメンバーを写真枠付きで紹介する。
+
+```markdown
+<div class="h-full grid grid-cols-4 gap-6 p-12">
+  <div class="flex flex-col items-center gap-3">
+    <div class="w-24 h-24 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-em-sm text-gray-400">写真</div>
+    <div class="text-em-base font-semibold text-gray-900">山田 太郎</div>
+    <div class="text-em-sm text-gray-500">プロジェクトリーダー</div>
+  </div>
+  <div class="flex flex-col items-center gap-3">
+    <div class="w-24 h-24 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-em-sm text-gray-400">写真</div>
+    <div class="text-em-base font-semibold text-gray-900">佐藤 花子</div>
+    <div class="text-em-sm text-gray-500">デザイナー</div>
+  </div>
+  <div class="flex flex-col items-center gap-3">
+    <div class="w-24 h-24 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-em-sm text-gray-400">写真</div>
+    <div class="text-em-base font-semibold text-gray-900">鈴木 一郎</div>
+    <div class="text-em-sm text-gray-500">エンジニア</div>
+  </div>
+  <div class="flex flex-col items-center gap-3">
+    <div class="w-24 h-24 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-em-sm text-gray-400">写真</div>
+    <div class="text-em-base font-semibold text-gray-900">田中 恵</div>
+    <div class="text-em-sm text-gray-500">マーケター</div>
+  </div>
+</div>
+```
+
+**デザインポイント**: アバター枠は A-5 / B-2 と同じ破線プレースホルダ規約の円形版で、後から写真に差し替える。列数が増える場合は B-3 系のグリッド密度規約に倣い、`gap` とフォントサイズを段階的に縮める。
+
+### G-7 コード提示
+
+**用途**: 実装例やコマンドをコードとして提示する。
+
+```markdown
+<div class="h-full flex flex-col justify-center px-16 gap-4">
+  <h3 class="text-em-xl font-bold text-gray-900">実装例</h3>
+  <pre class="bg-gray-900 rounded-lg p-6 overflow-hidden"><code class="font-mono text-em-sm text-gray-100 leading-relaxed">function greet(name) {
+  return `こんにちは、${name}さん`;
+}
+
+console.log(greet("marp"));</code></pre>
+</div>
+```
+
+**デザインポイント**: コードブロックは `bg-gray-900` に `font-mono` と `text-em-sm` の `text-gray-100` を明示して等幅表示にする。行数が増えるとスライドからはみ出すため5行程度を目安にする。
+
+### G-8 グラフ＋考察
+
+**用途**: グラフ画像を提示しながら、右側でその考察・示唆をまとめる。
+
+```markdown
+<div class="h-full grid grid-cols-2 gap-10 p-12 items-center">
+  <img src="images/graph.jpg" class="w-full rounded-lg" />
+  <div class="flex flex-col gap-4">
+    <h3 class="text-em-xl font-bold text-gray-900">考察</h3>
+    <ul class="flex flex-col gap-3 text-em-base text-gray-700">
+      <li>◆ 導入後3か月で問い合わせ対応時間が半減した</li>
+      <li>◆ 利用継続率は前年同期比で上昇傾向にある</li>
+      <li>◆ 今後は他部門への展開が課題となる</li>
+    </ul>
+  </div>
+</div>
+```
+
+**デザインポイント**: グラフ画像は E-2 / E-4 と同じ実パスの `<img>` 参照（`images/graph.jpg`）で配置し、ローカルファイルなので `--allow-local-files` を付け忘れない。箇条書きの記号は C-2 と同じ ◆ で統一する。
+
+### G-9 2軸4象限
+
+**用途**: ポジショニング・優先度づけ（重要度×緊急度など）を2軸4象限で示す。
+
+```markdown
+<div class="h-full flex flex-col justify-center gap-3 p-16">
+  <div class="flex justify-between pl-16 text-em-sm text-gray-500">
+    <span>緊急度 低</span>
+    <span>緊急度 高</span>
+  </div>
+  <div class="flex-1 flex gap-4">
+    <div class="flex flex-col justify-between text-em-sm text-gray-500 py-4">
+      <span>重要度 高</span>
+      <span>重要度 低</span>
+    </div>
+    <div class="flex-1 grid grid-cols-2 grid-rows-2 gap-2">
+      <div class="bg-gray-50 rounded-lg p-6 flex items-start text-em-base text-gray-700">第1象限</div>
+      <div class="bg-brand-teal/10 rounded-lg p-6 flex items-start text-em-base text-gray-700">第2象限</div>
+      <div class="bg-gray-100 rounded-lg p-6 flex items-start text-em-base text-gray-700">第3象限</div>
+      <div class="bg-gray-50 rounded-lg p-6 flex items-start text-em-base text-gray-700">第4象限</div>
+    </div>
+  </div>
+</div>
+```
+
+**デザインポイント**: 象限は濃淡＋アクセント1色の薄塗り（`bg-brand-teal/10` のみ着色、他は gray 系）で区別する。軸ラベルは `text-em-sm` の `text-gray-500` とし、回転文字は使わず横書きのまま上と左に配置する。B-6 の SWOT 型2x2グリッドとは異なり、軸の意味を明示するポジショニングマトリクスとして使う。
+
+### G-10 アーキ図
+
+**用途**: システム構成やデータフローを簡易アーキテクチャ図で示す。
+
+```markdown
+<div class="h-full flex flex-col justify-center items-center gap-6 px-16">
+  <h3 class="text-em-xl font-bold text-gray-900">システム構成</h3>
+  <img src="svg/arch.svg" class="w-full" />
+</div>
+```
+
+**デザインポイント**: `svg/` に手描きした最小サンプル SVG（3ボックス＋矢印）を `<img src="svg/arch.svg" class="w-full">` で配置する一例。より詳細な作図規約（配色・線幅など）は `svg-creator.md`（Task 10）を参照する。ローカルファイルなので `--allow-local-files` を忘れない。
