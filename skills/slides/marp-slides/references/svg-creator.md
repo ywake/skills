@@ -41,8 +41,8 @@
 スライドへの取り込みは用途に応じて2通り。いずれもローカルファイル参照になるため `--allow-local-files` が前提（`setup.md` / `layout-fix.md` 参照）。
 
 ```html
-<!-- 単純な画像として読み込む（既定・再利用しやすい） -->
-<img src="svg/diagram.svg" class="w-full" />
+<!-- 単純な画像として読み込む（既定・再利用しやすい）。slides/deck.md から見て svg/ は一つ上の階層のため ../ を付ける -->
+<img src="../svg/diagram.svg" class="w-full" />
 ```
 
 ```html
