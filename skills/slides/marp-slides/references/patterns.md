@@ -861,7 +861,7 @@ console.log(greet("marp"));</code></pre>
 
 ```markdown
 <div class="h-full grid grid-cols-2 gap-10 p-12 items-center">
-  <img src="images/graph.jpg" class="w-full rounded-lg" />
+  <img src="../images/graph.jpg" class="w-full rounded-lg" />
   <div class="flex flex-col gap-4">
     <h3 class="text-em-xl font-bold text-gray-900">考察</h3>
     <ul class="flex flex-col gap-3 text-em-base text-gray-700">
@@ -909,8 +909,8 @@ console.log(greet("marp"));</code></pre>
 ```markdown
 <div class="h-full flex flex-col justify-center items-center gap-6 px-16">
   <h3 class="text-em-xl font-bold text-gray-900">システム構成</h3>
-  <img src="svg/arch.svg" class="w-full" />
+  <img src="../svg/arch.svg" class="w-full" />
 </div>
 ```
 
-**デザインポイント**: `svg/` に手描きした最小サンプル SVG（3ボックス＋矢印）を `<img src="svg/arch.svg" class="w-full">` で配置する一例。より詳細な作図規約（配色・線幅など）は `svg-creator.md`（Task 10）を参照する。ローカルファイルなので `--allow-local-files` を忘れない。
+**デザインポイント**: `svg/` に手描きした最小サンプル SVG（3ボックス＋矢印）を `<img src="../svg/arch.svg" class="w-full">` で配置する一例（`slides/deck.md` から見て `svg/` は一つ上の階層のため `../` を付ける）。より詳細な作図規約（配色・線幅など）は `svg-creator.md`（Task 10）を参照する。ローカルファイルなので `--allow-local-files` を忘れない。
