@@ -8,6 +8,8 @@ ywake の [Agent Skills](https://docs.claude.com/en/docs/claude-code/skills) 置
 | スキル | 用途 |
 | --- | --- |
 | [wireframe-design](skills/design/wireframe-design/SKILL.md) | 実装前に画面構成・遷移・状態を、ブラウザで触れる低忠実度HTMLワイヤーで固める |
+| [marp-slides](skills/slides/marp-slides/SKILL.md) | Tailwind を使い、デザインパターン集の選択とレンダリング画像の目視検証で一貫性の高いスライドをコードから作る(試作) |
+| [manage-adr](skills/manage-adr/SKILL.md) | ADR（Architecture Decision Records）を生成・更新・レビューし、決定の Why と見送った選択肢を検索しやすく記録する |
 
 ## インストール
 
