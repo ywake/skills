@@ -7,7 +7,8 @@ ywake の [Agent Skills](https://docs.claude.com/en/docs/claude-code/skills) 置
 
 | スキル | 用途 |
 | --- | --- |
-| [wireframe-design](skills/design/wireframe-design/SKILL.md) | 実装前に画面構成・遷移・状態を、ブラウザで触れる低忠実度HTMLワイヤーで固める |
+| [html-wireframe](skills/design/html-wireframe/SKILL.md) | 実装前に画面構成・遷移・状態を、ブラウザで触れる低忠実度HTMLワイヤーで固める |
+| [penpot-wireframe](skills/design/penpot-wireframe/SKILL.md) | Penpot 公式 MCP の execute_code で、1画面＝1台紙ボード（画面枠＋注釈レーン）のワイヤーを生成し、そのまま PDF に出して配れる形にする |
 | [marp-slides](skills/slides/marp-slides/SKILL.md) | Tailwind を使い、デザインパターン集の選択とレンダリング画像の目視検証で一貫性の高いスライドをコードから作る(試作) |
 | [manage-adr](skills/design/manage-adr/SKILL.md) | ADR（Architecture Decision Records）を生成・更新・レビューし、決定の Why と見送った選択肢を検索しやすく記録する |
 | [git-commit](skills/dev/git-commit/SKILL.md) | コミット作成用 |
@@ -26,7 +27,7 @@ brew upgrade gh       # Homebrew の場合
 
 
 ```sh
-gh skill install ywake/skills wireframe-design
+gh skill install ywake/skills html-wireframe
 ```
 
 ### このリポジトリの全スキルを入れる
@@ -41,7 +42,7 @@ gh skill install ywake/skills --all
 ユーザースコープ（`~/.claude/skills/` 等）に置くと、どのプロジェクトからでも使える:
 
 ```sh
-gh skill install ywake/skills wireframe-design \
+gh skill install ywake/skills html-wireframe \
   --agent claude-code --scope user
 ```
 
@@ -51,13 +52,13 @@ gh skill install ywake/skills wireframe-design \
 ### 入れる前に中身を確認する
 
 ```sh
-gh skill preview ywake/skills wireframe-design
+gh skill preview ywake/skills html-wireframe
 ```
 
 ## 管理
 
 ```sh
 gh skill list                                    # 導入済みスキル一覧
-gh skill update ywake/skills wireframe-design     # スキルを1つだけ更新
+gh skill update ywake/skills html-wireframe     # スキルを1つだけ更新
 gh skill update --all                            # まとめて更新
 ```
