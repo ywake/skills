@@ -145,6 +145,55 @@ storage.WF = (() => {
   // 触れないと流れは検証できない。遷移は口頭説明でなく Penpot 上の接続として残す
   const link = (shape, destination) => shape.addInteraction('click', { type: 'navigate-to', destination });
 
+  /* --- アイコン ----------------------------------------------------------
+   * Penpot の共有ライブラリ（Penpot Hub の Lucide Icons）から実体化する。
+   * プラグインのサンドボックスは外部への fetch をブロックするため、実行時に
+   * アイコンを取りに行くことはできない。ライブラリ経由が唯一の現実的な経路。
+   *
+   * 名前は lucide とまったく同じ（settings / plus / bell / chevron-right …）なので、
+   * html-wireframe の `lucide:` 指定とそのまま対応する。
+   *
+   * instance() は 24×24 のボードを返し、中身は黒ストローク2pxのパス。
+   * 直後に detach() する: コンポーネントのまま子孫に手を入れても反映されないことがあり、
+   * ワイヤーでは元コンポーネントとの追従も要らないため、切り離したほうが確実で軽い。
+   * -------------------------------------------------------------------- */
+  let ICONLIB = null;
+
+  function icons({ name = 'lucide' } = {}) {
+    ICONLIB = penpot.library.connected.find((l) => l.name.toLowerCase().includes(name.toLowerCase())) || null;
+    if (!ICONLIB) {
+      throw new Error(
+        'アイコンライブラリが接続されていない。Penpot Hub の Lucide Icons をダッシュボードに取り込み、'
+        + '「共有ライブラリとして追加」したうえで、作業中のファイルから接続する（references/setup.md 参照）'
+      );
+    }
+    return ICONLIB;
+  }
+
+  function icon(parent, name, { size = 16, color = palette.muted } = {}) {
+    if (!ICONLIB) icons();
+    // 1420個あるので、名前一覧を作らず find で早期に打ち切る
+    const comp = ICONLIB.components.find((c) => c.name === name);
+    if (!comp) throw new Error(`アイコンが見つからない: ${name}（lucide の名前で指定する）`);
+    const inst = comp.instance();
+    parent.appendChild(inst);
+    if (inst.detach) inst.detach();
+    if (size !== 24) inst.resize(size, size);
+    if (color) {
+      inst.children.forEach((sh) => {
+        if (sh.strokes && sh.strokes.length) {
+          sh.strokes = sh.strokes.map((st) => ({ ...st, strokeColor: color }));
+        }
+      });
+    }
+    // レイアウト配下では resize のあとに sizing を固定する（place と同じ理由）
+    if (inst.layoutChild) {
+      inst.layoutChild.horizontalSizing = 'fix';
+      inst.layoutChild.verticalSizing = 'fix';
+    }
+    return inst;
+  }
+
   /* --- 台紙（＝PDF 1ページ） --------------------------------------------
    * Penpot の PDF 出力はボード単位でページを作る。ボード外の要素は PDF に載らないので、
    * 画面枠・見出し・注釈をすべて1枚の台紙ボードに収める。
@@ -259,6 +308,8 @@ storage.WF = (() => {
    * トップバー +（サイドナビ | 本体）。デスクトップ画面のほぼ全部がこの形になる。
    * 低忠実度では DRY より閲覧性を優先し、各画面にコピーして持たせる。
    * -------------------------------------------------------------------- */
+  // items は 'ラベル' か ['lucide名', 'ラベル']。アイコン付きのほうが実物に近く、
+  // ナビが「文字だけの箱の列」に見えてしまうのを避けられる。
   function shell(s, { title, items = [], active, user = 'ユーザー名 ▾', navWidth = 240 }) {
     const top = row(s, { h: 56, padding: 16, align: 'center', justify: 'space-between' });
     text(top, title, { size: 16, weight: '700' });
@@ -267,7 +318,11 @@ storage.WF = (() => {
     const main = row(s, { grow: true });
     const nav = col(main, { w: navWidth, grow: true, padding: 16, gap: 4, bg: '#F7F7F7' });
     items.forEach((item) => {
-      box(nav, { h: 36, label: item, justify: 'start', padding: 12, bg: item === active ? '#E4E4E4' : palette.frame });
+      const [ic, label] = Array.isArray(item) ? item : [null, item];
+      const b = box(nav, { h: 36, justify: 'start', padding: 12, bg: label === active ? '#E4E4E4' : palette.frame });
+      b.name = label;
+      if (ic) icon(b, ic, { size: 16 });
+      text(b, label, { size: 11, color: palette.muted });
     });
     const content = col(main, { grow: true, padding: 24, gap: 16 });
     return { top, nav, content };
@@ -379,7 +434,7 @@ storage.WF = (() => {
 
   const report = () => ({ pages: pages.map((b) => b.name), count: pages.length });
 
-  return { palette, devices, reset, doc, page, screen, overlay,
+  return { palette, devices, reset, doc, page, screen, overlay, icons, icon,
            row, col, text, box, field, button, shell, table, link, layoutPages, gridPlace, place, report,
            get pages() { return [...pages]; } };
 })();

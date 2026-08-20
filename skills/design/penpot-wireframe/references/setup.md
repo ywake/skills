@@ -36,6 +36,24 @@ high_level_overview を呼ぶ → ファイル名・ページ名・既存ボー�
 - 別のタブで Penpot を開いていて、そちらが MCP を掴んでいる（同時に1タブのみ）
 - ローカル版でプラグイン UI を閉じてしまった
 
+## アイコンライブラリの接続（初回のみ）
+
+`WF.icon()` は Penpot の共有ライブラリからアイコンを実体化する。プラグインのサンドボックスは外部への
+`fetch` をブロックするので、実行時にアイコンを取りに行くことはできない。以下は Penpot 上での手作業。
+
+1. [Lucide Icons](https://penpot.app/penpothub/libraries-templates/lucide-icons) をダッシュボードにインポートする
+2. インポートしたファイルのメニュー（ファイル名の左の三点）から **Add as Shared Library**
+3. ワイヤーを作るファイルを開き、アセットパネルからそのライブラリを接続する
+
+接続できたかの確認:
+
+```js
+return penpot.library.connected.map(l => l.name);   // 'Lucide-icons' が含まれること
+```
+
+`library.components` は 1420 個あり、全件を配列に展開すると重い。名前で引くときは `find` で早期に
+打ち切る（`WF.icon()` はそうしている）。
+
 ## 出典
 
 - Penpot MCP 公式ヘルプ: https://help.penpot.app/mcp/

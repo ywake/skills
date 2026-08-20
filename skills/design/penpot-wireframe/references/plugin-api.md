@@ -18,6 +18,7 @@
 - [全シェイプ共通](#全シェイプ共通)
 - [プロトタイプ接続](#プロトタイプ接続)
 - [オーバーレイ（重ね置き）](#オーバーレイ重ね置き)
+- [共有ライブラリ（アイコン）](#共有ライブラリアイコン)
 - [型の落とし穴](#型の落とし穴)
 
 ## 実行環境 (storage / penpotUtils)
@@ -173,6 +174,23 @@ penpotUtils.setParentXY(panel, x, y);// parentX/parentY は読み取り専用な
 `<text>` が Penpot の Text にならず **`svg-raw` のまま入るため、文言を編集できない**。
 あとから直す可能性があるものは、ネイティブ図形（ボード＋テキスト＋矩形）で組むこと。
 
+## 共有ライブラリ（アイコン）
+
+```ts
+penpot.library.connected: Library[]          // 接続済み
+penpot.library.availableLibraries(): Promise<LibrarySummary[]>
+penpot.library.connectLibrary(id): Promise<Library>
+library.components: LibraryComponent[]
+component.instance(): Shape                  // 実体をカレントページに作る
+shape.detach(): void                         // 元コンポーネントとの結び付きを切る
+```
+
+Penpot Hub の **Lucide Icons** を取り込んだ場合に実機で確認できたこと:
+
+- コンポーネント数は 1420。名前は lucide と同じフラット名（`settings` / `plus` / `bell`）で、階層区切りは無い
+- `instance()` は **24×24 のボード**を返す。子は境界用の透明な矩形＋黒ストローク2pxの `path` / `ellipse`
+- 寸法・色を変えるなら `detach()` してから。コンポーネントのままだと子孫への変更が反映されないことがある
+
 ## 型の落とし穴
 
 上から3つは実機で踏んだもの。いずれも**例外を出さず、見た目だけが壊れる**。
@@ -192,5 +210,7 @@ penpotUtils.setParentXY(panel, x, y);// parentX/parentY は読み取り専用な
 | 読み戻した `fillColor` は**小文字** | `fills[0].fillColor === '#C4C4C4'` が常に false になる | 比較は `toUpperCase()` を通す |
 | `navigate-to` の `destination` は Board オブジェクト | id 文字列だと接続されない | 生成した Board 変数をそのまま渡す |
 | `export_shape` に `shapeId:'page'` | ルートフレームは幅0扱いでタイムアウトする | 各ボードの `id` を渡す |
+| `fetch` は存在するが**ブロックされる** | 外部から画像やアイコンを取ってこようとして `Failed to fetch` | 実行時取得は諦め、共有ライブラリ経由にする |
+| `library.components` の全件展開が重い | 1420件を map すると呼び出しごとタイムアウトする | `find` で早期に打ち切る。名前一覧を作らない |
 | PDF のページ順はレイヤー順の**逆** | 最前面のボードが1ページ目になり、資料が逆順で出る | 意図したページ順を `setParentIndex(n-1-i)` で children の逆順に置く |
 | `clone()` は元の隣に挿入される | クローンしたページが下地の直後に割り込み、順序が崩れる | 生成後にまとめて `setParentIndex` で並べ直す |
