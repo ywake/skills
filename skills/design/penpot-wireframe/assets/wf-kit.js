@@ -39,12 +39,15 @@ storage.WF = (() => {
   const stroke = (c) => [{ strokeColor: c, strokeStyle: 'solid', strokeWidth: 1, strokeAlignment: 'inner' }];
 
   /* --- レイアウト配下のサイズ指定 ---------------------------------------
-   * ここが実機で二度こけた箇所。両方ともコードは例外なく通り、書き出し画像を
+   * ここが実機で何度もこけた箇所。いずれもコードは例外なく通り、書き出し画像を
    * 見るまで気づけない類の失敗なので、必ずこの関数を通してサイズを決める。
    *   (1) resize() は layoutChild の sizing を 'fix' に戻す（Text の growType と同じ挙動）
    *       → resize してから sizing を設定する。逆順だと指定が消える。
    *   (2) 寸法を指定しないまま 'fix' にすると既定の 100px で固定され、中身が枠から溢れる
    *       → 高さ未指定なら 'auto'（中身なり）にする。
+   *   (3) grow は「縦に fill」。高さを決めた要素（ボタン・入力欄・ナビ項目）に渡すと、
+   *       兄弟と親の高さを分け合って 0px に潰れるか、逆に画面いっぱいに間延びする。
+   *       「親幅いっぱい」は w 未指定（横 fill が既定）で得る。grow を横伸ばしに使わない。
    * -------------------------------------------------------------------- */
   function place(shape, { w, h, grow = false } = {}) {
     if (w || h) shape.resize(w ?? shape.width, h ?? shape.height);
@@ -92,18 +95,49 @@ storage.WF = (() => {
   const row = (p, o) => container(p, 'row', o);
   const col = (p, o) => container(p, 'column', o);
 
+  /* --- 中身なり幅（hug）と一括再計算（settle） ---------------------------
+   * horizontalSizing='auto' は**子を入れる前**に指定しても効かず、既定 100px の
+   * まま焼き付く（子を足しても再計算されない）。ヘッダー右側のボタン群のように
+   * 「中身のぶんだけ」の幅が要るコンテナは、hug() で印だけ付けて子を組み、
+   * 画面を組み終えてから settle(sheet) を1回呼ぶ。'fix'→'auto' と設定し直す
+   * ことで再計算が走る。
+   * -------------------------------------------------------------------- */
+  const HUG = 'wf-hug';
+  const hug = (shape) => { shape.setPluginData(HUG, '1'); return shape; };
+  function settle(root) {
+    penpotUtils.analyzeDescendants(root, (r, sh) => {
+      if (sh.type !== 'board' || !sh.flex) return;
+      if (sh.getPluginData(HUG) !== '1') return;
+      return () => {
+        sh.flex.horizontalSizing = 'fix';
+        sh.flex.horizontalSizing = 'auto';
+        if (sh.layoutChild) sh.layoutChild.horizontalSizing = 'auto';
+      };
+    }).forEach((f) => f.result());
+  }
+
   /* --- テキスト ----------------------------------------------------------
    * fontSize / fontWeight は数値でなく文字列。数値を渡すと例外にならず無視される。
    * 自動サイズは即座に反映されない。幅・高さを読む必要があるなら ~150ms 待つ。
+   *
+   * 既定（auto-width）のテキストは親の幅を超えても**折り返さず**、黙って枠を
+   * 突き抜ける。注釈レーンの長文など折り返しが要る箇所は wrap: true を渡す
+   * （幅は親なり・高さは中身なりになる。親の alignItems も stretch に変える）。
    * -------------------------------------------------------------------- */
-  function text(parent, str, { size = 12, weight = '400', color = palette.text } = {}) {
+  function text(parent, str, { size = 12, weight = '400', color = palette.text, wrap = false } = {}) {
     const t = penpot.createText(str);
     if (!t) throw new Error(`createText が null を返した: ${str}`);
-    t.growType = 'auto-width';
     t.fontSize = String(size);
     t.fontWeight = String(weight);
     t.fills = fill(color);
     parent.appendChild(t);
+    if (wrap) {
+      if (parent.flex) parent.flex.alignItems = 'stretch';
+      t.growType = 'auto-height';
+      if (t.layoutChild) t.layoutChild.horizontalSizing = 'fill';
+    } else {
+      t.growType = 'auto-width';
+    }
     return t;
   }
 
@@ -158,6 +192,7 @@ storage.WF = (() => {
    * ワイヤーでは元コンポーネントとの追従も要らないため、切り離したほうが確実で軽い。
    * -------------------------------------------------------------------- */
   let ICONLIB = null;
+  let ICONMAP = null;   // name → component。数十回呼ぶと 1420 件の線形探索が効いてくるので索引を作る
 
   function icons({ name = 'lucide' } = {}) {
     ICONLIB = penpot.library.connected.find((l) => l.name.toLowerCase().includes(name.toLowerCase())) || null;
@@ -167,30 +202,36 @@ storage.WF = (() => {
         + '「共有ライブラリとして追加」したうえで、作業中のファイルから接続する（references/setup.md 参照）'
       );
     }
+    ICONMAP = new Map(ICONLIB.components.map((c) => [c.name, c]));
     return ICONLIB;
   }
 
-  function icon(parent, name, { size = 16, color = palette.muted } = {}) {
-    if (!ICONLIB) icons();
-    // 1420個あるので、名前一覧を作らず find で早期に打ち切る
-    const comp = ICONLIB.components.find((c) => c.name === name);
+  function icon(parent, name, { size = 16, color = palette.muted, strokeWidth = 1.5 } = {}) {
+    if (!ICONMAP) icons();
+    const comp = ICONMAP.get(name);
     if (!comp) throw new Error(`アイコンが見つからない: ${name}（lucide の名前で指定する）`);
     const inst = comp.instance();
+    if (inst.detach) inst.detach();     // 追従不要なので先に切る。以降の子孫への変更が確実に効く
+    inst.name = `i-${name}`;
     parent.appendChild(inst);
-    if (inst.detach) inst.detach();
+    // 縮小は「子の constraints を scale にしてから resize」の順。先に resize すると
+    // 枠だけ縮んで中身のパスが 24px のまま残り、はみ出す。
+    inst.children.forEach((c) => { c.constraintsHorizontal = 'scale'; c.constraintsVertical = 'scale'; });
     if (size !== 24) inst.resize(size, size);
-    if (color) {
-      inst.children.forEach((sh) => {
-        if (sh.strokes && sh.strokes.length) {
-          sh.strokes = sh.strokes.map((st) => ({ ...st, strokeColor: color }));
-        }
-      });
-    }
     // レイアウト配下では resize のあとに sizing を固定する（place と同じ理由）
     if (inst.layoutChild) {
       inst.layoutChild.horizontalSizing = 'fix';
       inst.layoutChild.verticalSizing = 'fix';
     }
+    inst.children.forEach((sh) => {
+      // base-background は境界用の矩形。黒ストロークが付いていることがあり、
+      // 残すとアイコンが「黒い箱入り」で描画される。塗りごと消す。
+      if (sh.name === 'base-background') { sh.strokes = []; sh.fills = []; return; }
+      if (sh.strokes && sh.strokes.length) {
+        // 原寸 24px の線幅 2px は 16px に縮めると太い。線幅も一緒に落とす
+        sh.strokes = sh.strokes.map((st) => ({ ...st, strokeColor: color, strokeWidth }));
+      }
+    });
     return inst;
   }
 
@@ -231,12 +272,31 @@ storage.WF = (() => {
   /* --- 資料の初期化 ------------------------------------------------------
    * 台紙サイズを確定する。以降のページはすべてこのサイズで作られる。
    * ページごとに紙の大きさが変わる資料は読みづらいので、最初に一度だけ決める。
+   *
+   * resume: true は接続断からの再開用。storage が消えても既存ボードはファイルに
+   * 残っているので、ページ上の `WF-01-02-…` 名から枝番・配置グループを拾い直す。
+   * これを忘れて素の doc() から作り足すと、採番が 01 に戻って名前が衝突し、
+   * layoutPages() も新しいボードしか並べなくなる。
    * -------------------------------------------------------------------- */
-  function doc({ device = 'desktop' } = {}) {
+  function doc({ device = 'desktop', resume = false } = {}) {
     SHEET = sheetSize(device);
     pages.length = 0;
     groups.clear();
     stateSeq.clear();
+    if (resume) {
+      const re = new RegExp(`^${PREFIX}(\\d\\d)-(\\d\\d)-`);
+      penpot.currentPage.root.children
+        .filter((s) => re.test(s.name || ''))
+        .sort((a, b) => a.name.localeCompare(b.name, 'ja'))
+        .forEach((b) => {
+          const m = re.exec(b.name);
+          const id = m[1];
+          stateSeq.set(id, Math.max(stateSeq.get(id) || 0, Number(m[2])));
+          pages.push(b);
+          if (!groups.has(id)) groups.set(id, []);
+          groups.get(id).push(b);
+        });
+    }
     return SHEET;
   }
 
@@ -259,17 +319,19 @@ storage.WF = (() => {
    * -------------------------------------------------------------------- */
   function annotator(lane) {
     let todoHead = false;
+    // 注釈は長文になるので wrap: true で折り返す。素の text だとレーン幅を
+    // 突き抜けて切れ、PDF でいちばん大事な情報が読めなくなる
     // note('「＋ 新規作成」ボタン', '押下すると 04 …') — 対象名は太字で頭出しする
     const note = (label, str) => {
       const r = col(lane, { gap: 2 });
-      text(r, label, { size: 11, weight: '700' });
-      text(r, str, { size: 11 });
+      text(r, label, { size: 11, weight: '700', wrap: true });
+      text(r, str, { size: 11, wrap: true });
       return r;
     };
     // 未確定事項。挙動の説明と地続きだと読み分けられないので小見出しを挟む
     const todo = (str) => {
       if (!todoHead) { text(lane, '未確定事項', { size: 10, color: palette.muted }); todoHead = true; }
-      return text(lane, `・${str}`, { size: 11, color: palette.note });
+      return text(lane, `・${str}`, { size: 11, color: palette.note, wrap: true });
     };
     return { note, todo };
   }
@@ -435,7 +497,8 @@ storage.WF = (() => {
   const report = () => ({ pages: pages.map((b) => b.name), count: pages.length });
 
   return { palette, devices, reset, doc, page, screen, overlay, icons, icon,
-           row, col, text, box, field, button, shell, table, link, layoutPages, gridPlace, place, report,
+           row, col, text, box, field, button, shell, table, link, layoutPages, gridPlace, place,
+           hug, settle, report,
            get pages() { return [...pages]; } };
 })();
 
