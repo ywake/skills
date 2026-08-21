@@ -94,12 +94,13 @@
         </div>
       </div>
 
-      <!-- 注釈: この画面/状態の要素ルールを 1〜3 行で。monospace。phone は幅を枠に合わせる。 -->
-      <p class="note text-[11px] text-neutral-500 mt-2 max-w-[375px]">
-        ・この状態で出す/出さない要素のルールを書く<br>
-        ・まだ決まっていない点は「未確定」と明記する<br>
-        ・決定とその理由は spec が正。ここには転記せず、spec の該当箇所へリンクする
-      </p>
+      <!-- 注釈エリア: 置いてよいのは操作（状態切替のボタン等）だけ。
+           出し分けルール・決定・未確定は spec / screens.md に書く。文章を書き始めると
+           画面間でコピペされて増殖し、更新されない「二つ目の仕様書」になる -->
+      <div class="note text-[11px] text-neutral-500 mt-2 max-w-[375px] flex flex-wrap gap-1">
+        <button onclick="wfOpen('confirmModal')"
+                class="border border-neutral-400 rounded px-2 py-1 hover:bg-neutral-100">確認モーダルを開く</button>
+      </div>
     </section>
   </div>
 
