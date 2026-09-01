@@ -12,6 +12,7 @@ ywake の [Agent Skills](https://docs.claude.com/en/docs/claude-code/skills) 置
 | [marp-slides](skills/slides/marp-slides/SKILL.md) | Tailwind を使い、デザインパターン集の選択とレンダリング画像の目視検証で一貫性の高いスライドをコードから作る(試作) |
 | [manage-adr](skills/design/manage-adr/SKILL.md) | ADR（Architecture Decision Records）を生成・更新・レビューし、決定の Why と見送った選択肢を検索しやすく記録する |
 | [git-commit](skills/dev/git-commit/SKILL.md) | コミット作成用 |
+| [show-me](skills/fork/show-me/SKILL.md) | 会話中のトピックを図・擬似コード・HTMLで視覚的に説明する（[humanlayer/skills](https://github.com/humanlayer/skills) からのフォーク） |
 
 ## インストール
 
