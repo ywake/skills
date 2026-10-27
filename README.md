@@ -15,6 +15,7 @@ ywake の [Agent Skills](https://docs.claude.com/en/docs/claude-code/skills) 置
 | [manage-adr](skills/design/manage-adr/SKILL.md) | ADR（Architecture Decision Records）を生成・更新・レビューし、決定の Why と見送った選択肢を検索しやすく記録する |
 | [git-commit](skills/dev/git-commit/SKILL.md) | コミット作成用 |
 | [pr-digest](skills/dev/pr-digest/SKILL.md) | PR の diff を関心ごとに分解し、周辺コードの引用・意図の復元・確認点を添えたレポートを作り、レビューをレポートだけで判断できる状態にする |
+| [gh-stack](skills/dev/gh-stack/SKILL.md) | `gh stack` で Stacked PRs を作る・積み直す・マージする。非対話のエージェントが詰まる点とフラグ付きの実行形をまとめ、毎回 `--help` を引かずに済むようにする |
 
 ## インストール
 
