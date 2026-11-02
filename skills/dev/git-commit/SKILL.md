@@ -32,7 +32,12 @@ typeはConventional Commitsに従う：feat / fix / docs / style / refactor / te
 ## 吸収（amend / rebase）
 
 「直前のコミットの続き」に見える変更は新しいコミットを作らず吸収させる。
-push前のみ使用可。push済みのコミットには使わない。
+履歴を書き換えても他人に影響しないブランチでのみ使う。
+
+- 使用可：push前のコミット。push済みでも、自分のPRのブランチ（他人のコミットが混ざっていない）
+- 使用不可：main などの共有ブランチ、他人が push している・ベースにしているブランチ
+
+push済みのコミットを吸収したら `git push --force-with-lease` で反映する。
 
 ## Claudeが確認するタイミング
 
