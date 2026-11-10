@@ -26,10 +26,22 @@ disable-model-invocation: true
 - レビューは `specgate:specgate-reviewer` だけに依頼する。自分でレビューを済ませない。
 - 実装をサブエージェントに任せない。調査に Explore を使うのは構わない。
 - レビュースレッドを resolve しない。`spec-approved` ラベルを付けない。マージしない。
-- レビュー役と同じ GitHub アカウントで投稿される。自分の投稿の先頭には必ず `**[specgate-dev]**` を付ける。`**[specgate-reviewer]**` が付いた投稿がレビュー役のもの。
+- レビュー役と同じ GitHub アカウントで投稿される。自分の投稿の先頭には必ず dev のバッジを付ける。reviewer のバッジが付いた投稿がレビュー役のもの(下の「バッジ」)。
 - 指摘の中身は GitHub から読む。レビュー役からの報告は、判定と未解決の件数の確認にだけ使う。
 - レビュー役が動いている間は、完了の通知を待つ。作業ツリーを変更しない(編集、コミット、ブランチの切り替え)。
 - レビュー役の判定が ESCALATE のときは、理由をユーザーに伝えて判断を仰ぐ。
+
+## バッジ
+
+投稿者と指摘の種別は、shields.io のバッジで書かれる。自分の投稿には、dev の Markdown をそのまま書く。
+
+| 名前 | 意味 | Markdown |
+| --- | --- | --- |
+| dev | 実装役(自分)の投稿 | `![specgate-dev](https://img.shields.io/badge/specgate-dev-green)` |
+| reviewer | レビュー役の投稿 | `![specgate-reviewer](https://img.shields.io/badge/specgate-reviewer-blueviolet)` |
+| 要修正 | 指摘の種別 | `![要修正](https://img.shields.io/badge/%E8%A6%81%E4%BF%AE%E6%AD%A3-red)` |
+| 提案 | 指摘の種別 | `![提案](https://img.shields.io/badge/%E6%8F%90%E6%A1%88-blue)` |
+| 要判断 | 指摘の種別 | `![要判断](https://img.shields.io/badge/%E8%A6%81%E5%88%A4%E6%96%AD-orange)` |
 
 ## レビュー役の呼び方
 
@@ -60,8 +72,8 @@ disable-model-invocation: true
 1. `issue #N` でレビュー役に依頼し、完了を待つ。
 2. `gh issue view N --comments` で指摘を読む。
 3. 指摘に対応する。
-   - `[要修正]`: issue 本文を直す(`gh issue edit N --body-file <ファイル>`)。
-   - `[要判断]`: ユーザーに聞き、決まった内容を issue 本文に反映する。
+   - 要修正: issue 本文を直す(`gh issue edit N --body-file <ファイル>`)。
+   - 要判断: ユーザーに聞き、決まった内容を issue 本文に反映する。
 4. 1つのコメントで、番号ごとに返信する。対応した内容か、対応しない理由を書く。
 5. `再確認 issue #N` で依頼する。判定が FAIL なら 2 から繰り返す。
 
@@ -100,12 +112,12 @@ query($owner:String!,$repo:String!,$pr:Int!){
 ```
 
 3. 未解決の指摘に、種別ごとに対応する。直した分はコミットして push する。
-   - `[要修正]`: 修正する。納得できない指摘は、直さずに理由を返信してよい。
-   - `[提案]`: 直すかどうかを自分で決める。issue の「やらないこと」に当たる提案は直さない。
+   - 要修正: 修正する。納得できない指摘は、直さずに理由を返信してよい。
+   - 提案: 直すかどうかを自分で決める。issue の「やらないこと」に当たる提案は直さない。
 4. スレッドごとに返信する。何をどう直したか(コミットを示す)、または直さない理由を書く。
 
 ```bash
-gh api graphql -f id=THREAD_ID -f body='**[specgate-dev]** 〈内容〉' -f query='
+gh api graphql -f id=THREAD_ID -f body='![specgate-dev](https://img.shields.io/badge/specgate-dev-green) 〈内容〉' -f query='
 mutation($id:ID!,$body:String!){
   addPullRequestReviewThreadReply(input:{pullRequestReviewThreadId:$id, body:$body}){
     comment{ id }
