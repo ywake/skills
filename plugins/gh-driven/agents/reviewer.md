@@ -26,7 +26,7 @@ experimental:
 - 回数は、自分の過去の投稿のうち、本文に「仕様レビュー N回目」「コードレビュー N回目」と書いたものから数える。スレッドへの返信は数えない。`issue #N` と `PR #N` の依頼は 1回目として始め、`再確認` の依頼は直近の回数に 1 を足す。
 - `再確認` で呼ばれたのに前回の記憶がない場合は、新規に起動されている。GitHub 上の、reviewer のバッジが付いた過去投稿を読めば続きができる。
 - 投稿の本文は、引用符付きのヒアドキュメントで標準入力から渡す(下の各例の形)。コマンドの引数に直接書くと、本文中の引用符で壊れる。
-- この文書のコマンドは例。必要な情報が取れないときや失敗したときは、`gh <コマンド> --help` で確認して、目的に合うように調整する。
+- GitHub の読み書きには、プラグインに同梱のスクリプト(下の各例の `gh_driven.py`)を使う。スクリプトで足りないときや失敗したときは、`gh` を直接使い、`gh <コマンド> --help` で確認して、目的に合うように調整する。
 
 ## バッジ
 
@@ -62,7 +62,7 @@ experimental:
 投稿の例:
 
 ```bash
-gh issue comment N --body-file - <<'EOF'
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/gh_driven.py" comment N <<'EOF'
 ![gh-driven-reviewer](https://img.shields.io/badge/gh--driven-reviewer-blueviolet) 仕様レビュー 1回目
 
 - S1 ![要修正](https://img.shields.io/badge/review-%E8%A6%81%E4%BF%AE%E6%AD%A3-red) 〈該当箇所〉: 〈問題〉 → 〈解決の条件〉
@@ -130,10 +130,10 @@ EOF
    - 投稿が 422 で失敗したら、行の指定が差分に合っていない。行コメントが1件でも不正だと、レビュー全体が投稿されない。エラーはどの行コメントが原因かを示さないので、各行を差分と照らして探し、原因の行コメントを G 番号に回して投稿し直す。
 9. 判定は、要修正が1件でもあれば FAIL、なければ PASS。指摘が提案だけでも、指摘がなくても、PASS のレビューを投稿する。
 
-投稿には、プラグインに同梱のスクリプトを使う。標準入力の最初の `=== ` 行より前がレビュー本文で、`=== パス:行番号` の行から次の `=== ` 行までが1件の行コメントになる。行コメントがなければ、本文だけを渡す。スクリプトは `event` を `COMMENT` にして投稿し、レビューの URL を表示する。`--dry-run` を付けると、投稿せずに送る内容を表示する。
+投稿には、スクリプトの `review` を使う。標準入力の最初の `=== ` 行より前がレビュー本文で、`=== パス:行番号` の行から次の `=== ` 行までが1件の行コメントになる。行コメントがなければ、本文だけを渡す。スクリプトは `event` を `COMMENT` にして投稿し、レビューの URL を表示する。`--dry-run` を付けると、投稿せずに送る内容を表示する。
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/post_review.py" N 〈headRefOid〉 <<'EOF'
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/gh_driven.py" review N 〈headRefOid〉 <<'EOF'
 ![gh-driven-reviewer](https://img.shields.io/badge/gh--driven-reviewer-blueviolet) コードレビュー 1回目
 
 対象: 〈先頭コミット〉
@@ -153,32 +153,10 @@ EOF
 ## D. コードの再確認(`再確認 PR #N`)
 
 1. C の手順1と2を行う。PR の先頭コミットが前回のレビューの対象から変わっていれば、テストと lint を再実行する。変わっていなければ、前回の結果を使う。
-2. 過去のレビュー本文、レビュースレッド、実装役の PR コメント(G 番号への返信)を取得する。
+2. 過去のレビュー本文、レビュースレッド、実装役の PR コメント(G 番号への返信)を取得する。`show` は、この3つを `reviews`、`threads`、`comments` に分けた JSON で表示する。どれにも投稿者(`user`)が付く。`reviews` には、回数、G 番号、前回の対象コミットが載っている。
 
 ```bash
-# 過去のレビュー本文(回数、G 番号、前回の対象コミット)。本文が空のレビューは、スレッドへの返信に伴ってできたものなので除く
-gh api 'repos/{owner}/{repo}/pulls/N/reviews' --paginate \
-  --jq '.[] | select(.body != "") | {user: .user.login, submitted_at, commit_id, body}'
-
-# レビュースレッド
-gh api graphql --paginate -F owner='{owner}' -F repo='{repo}' -F pr=N -f query='
-query($owner:String!,$repo:String!,$pr:Int!,$endCursor:String){
-  repository(owner:$owner,name:$repo){
-    pullRequest(number:$pr){
-      reviewThreads(first:100, after:$endCursor){
-        pageInfo{ hasNextPage endCursor }
-        nodes{
-          id isResolved isOutdated path line
-          comments(first:50){ nodes{ author{ login } body createdAt } }
-        }
-      }
-    }
-  }
-}'
-
-# PR コメント
-gh api 'repos/{owner}/{repo}/issues/N/comments' --paginate \
-  --jq '.[] | {user: .user.login, created_at, body}'
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/gh_driven.py" show N
 ```
 
 3. 自分が開いた未解決のスレッドごとに、実装役の返信と現在のコードを確認する。
@@ -190,20 +168,12 @@ gh api 'repos/{owner}/{repo}/issues/N/comments' --paginate \
 
 ```bash
 # 返信
-gh api graphql -f id=THREAD_ID -F body=@- -f query='
-mutation($id:ID!,$body:String!){
-  addPullRequestReviewThreadReply(input:{pullRequestReviewThreadId:$id, body:$body}){
-    comment{ id }
-  }
-}' <<'EOF'
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/gh_driven.py" reply THREAD_ID <<'EOF'
 ![gh-driven-reviewer](https://img.shields.io/badge/gh--driven-reviewer-blueviolet) 〈内容〉
 EOF
 
-# resolve
-gh api graphql -f id=THREAD_ID -f query='
-mutation($id:ID!){
-  resolveReviewThread(input:{threadId:$id}){ thread{ isResolved } }
-}'
+# resolve(複数まとめて指定できる)
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/gh_driven.py" resolve THREAD_ID
 ```
 
 4. G 番号の指摘は、実装役の PR コメントと現在のコードを見て、スレッドと同じ基準で番号ごとに判定する。
