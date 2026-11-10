@@ -36,9 +36,9 @@ experimental:
 | --- | --- | --- |
 | reviewer | レビュー役(自分)の投稿 | `![gh-driven-reviewer](https://img.shields.io/badge/gh--driven-reviewer-blueviolet)` |
 | dev | 実装役の投稿 | `![gh-driven-dev](https://img.shields.io/badge/gh--driven-dev-green)` |
-| 要修正 | 指摘の種別 | `![要修正](https://img.shields.io/badge/finding-%E8%A6%81%E4%BF%AE%E6%AD%A3-red)` |
-| 提案 | 指摘の種別 | `![提案](https://img.shields.io/badge/finding-%E6%8F%90%E6%A1%88-blue)` |
-| 要判断 | 指摘の種別 | `![要判断](https://img.shields.io/badge/finding-%E8%A6%81%E5%88%A4%E6%96%AD-orange)` |
+| 要修正 | 指摘の種別 | `![要修正](https://img.shields.io/badge/review-%E8%A6%81%E4%BF%AE%E6%AD%A3-red)` |
+| 提案 | 指摘の種別 | `![提案](https://img.shields.io/badge/review-%E6%8F%90%E6%A1%88-blue)` |
+| 要判断 | 指摘の種別 | `![要判断](https://img.shields.io/badge/review-%E8%A6%81%E5%88%A4%E6%96%AD-orange)` |
 | 裁定 | ユーザーの決定(実装役が書く) | `![ユーザー裁定](https://img.shields.io/badge/user-%E8%A3%81%E5%AE%9A-yellow)` |
 
 ## A. 仕様レビュー(`issue #N`)
@@ -65,8 +65,8 @@ experimental:
 gh issue comment N --body-file - <<'EOF'
 ![gh-driven-reviewer](https://img.shields.io/badge/gh--driven-reviewer-blueviolet) 仕様レビュー 1回目
 
-- S1 ![要修正](https://img.shields.io/badge/finding-%E8%A6%81%E4%BF%AE%E6%AD%A3-red) 〈該当箇所〉: 〈問題〉 → 〈解決の条件〉
-- S2 ![要判断](https://img.shields.io/badge/finding-%E8%A6%81%E5%88%A4%E6%96%AD-orange) 〈該当箇所〉: 〈問題〉 → 〈決めてほしいこと〉
+- S1 ![要修正](https://img.shields.io/badge/review-%E8%A6%81%E4%BF%AE%E6%AD%A3-red) 〈該当箇所〉: 〈問題〉 → 〈解決の条件〉
+- S2 ![要判断](https://img.shields.io/badge/review-%E8%A6%81%E5%88%A4%E6%96%AD-orange) 〈該当箇所〉: 〈問題〉 → 〈決めてほしいこと〉
 
 判定: FAIL(未解決 2件)
 EOF
@@ -143,12 +143,12 @@ cat > "$d/body.md" <<'EOF'
 完了条件: 3件中2件を確認
 テスト: 成功
 
-- G1 ![要修正](https://img.shields.io/badge/finding-%E8%A6%81%E4%BF%AE%E6%AD%A3-red) 〈問題〉 → 〈解決の条件〉
+- G1 ![要修正](https://img.shields.io/badge/review-%E8%A6%81%E4%BF%AE%E6%AD%A3-red) 〈問題〉 → 〈解決の条件〉
 
 判定: FAIL(未解決: 要修正 1件、提案 1件)
 EOF
 cat > "$d/c1.md" <<'EOF'
-![gh-driven-reviewer](https://img.shields.io/badge/gh--driven-reviewer-blueviolet) ![提案](https://img.shields.io/badge/finding-%E6%8F%90%E6%A1%88-blue) 〈問題〉 → 〈解決の条件〉
+![gh-driven-reviewer](https://img.shields.io/badge/gh--driven-reviewer-blueviolet) ![提案](https://img.shields.io/badge/review-%E6%8F%90%E6%A1%88-blue) 〈問題〉 → 〈解決の条件〉
 EOF
 
 # 行コメントは、1件につき path、line、side、body を続けて書く。4つとも -F で渡す(-f を混ぜると、項目の組み合わせが崩れる)
