@@ -42,10 +42,10 @@ disable-model-invocation: true
 | --- | --- | --- |
 | dev | 実装役(自分)の投稿 | `![gh-driven-dev](https://img.shields.io/badge/gh--driven-dev-green)` |
 | reviewer | レビュー役の投稿 | `![gh-driven-reviewer](https://img.shields.io/badge/gh--driven-reviewer-blueviolet)` |
-| 要修正 | 指摘の種別 | `![要修正](https://img.shields.io/badge/%E8%A6%81%E4%BF%AE%E6%AD%A3-red)` |
-| 提案 | 指摘の種別 | `![提案](https://img.shields.io/badge/%E6%8F%90%E6%A1%88-blue)` |
-| 要判断 | 指摘の種別 | `![要判断](https://img.shields.io/badge/%E8%A6%81%E5%88%A4%E6%96%AD-orange)` |
-| 裁定 | ユーザーの決定 | `![ユーザー裁定](https://img.shields.io/badge/%E3%83%A6%E3%83%BC%E3%82%B6%E3%83%BC%E8%A3%81%E5%AE%9A-yellow)` |
+| 要修正 | 指摘の種別 | `![要修正](https://img.shields.io/badge/finding-%E8%A6%81%E4%BF%AE%E6%AD%A3-red)` |
+| 提案 | 指摘の種別 | `![提案](https://img.shields.io/badge/finding-%E6%8F%90%E6%A1%88-blue)` |
+| 要判断 | 指摘の種別 | `![要判断](https://img.shields.io/badge/finding-%E8%A6%81%E5%88%A4%E6%96%AD-orange)` |
+| 裁定 | ユーザーの決定 | `![ユーザー裁定](https://img.shields.io/badge/user-%E8%A3%81%E5%AE%9A-yellow)` |
 
 ## レビュー役の呼び方
 
