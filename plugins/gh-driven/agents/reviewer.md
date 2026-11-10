@@ -125,12 +125,13 @@ EOF
 8. 指摘を1回のレビューにまとめて投稿する。
    - 差分の行を指定できる指摘は、必ず行コメントにする。複数の箇所に当たる指摘は、代表の1行に付けて、他の箇所を本文に書く。
    - 行コメントを付けられるのは、差分のハンクに含まれる行だけ。追加した行と変更のない行は変更後の行番号で、削除した行は変更前の行番号に `LEFT` を付けて指定する。
+   - 指摘が複数行にまたがるときは、`開始-終了` の範囲で指定する。範囲は、同じハンクの中に収める。
    - 差分のどの行にも紐づけられない指摘だけ、レビュー本文に G1, G2… の番号で書く。
    - レビュー本文には、対象にした PR の先頭コミットを書く。投稿のスクリプトにも、手順1で取得した `headRefOid` を渡す。
    - 投稿が 422 で失敗したら、行の指定が差分に合っていない。行コメントが1件でも不正だと、レビュー全体が投稿されない。エラーはどの行コメントが原因かを示さないので、各行を差分と照らして探し、原因の行コメントを G 番号に回して投稿し直す。
 9. 判定は、要修正が1件でもあれば FAIL、なければ PASS。指摘が提案だけでも、指摘がなくても、PASS のレビューを投稿する。
 
-投稿には、スクリプトの `review` を使う。標準入力の最初の `=== ` 行より前がレビュー本文で、`=== パス:行番号` の行から次の `=== ` 行までが1件の行コメントになる。行コメントがなければ、本文だけを渡す。スクリプトは `event` を `COMMENT` にして投稿し、レビューの URL を表示する。`--dry-run` を付けると、投稿せずに送る内容を表示する。
+投稿には、スクリプトの `review` を使う。標準入力の最初の `=== ` 行より前がレビュー本文で、`=== パス:行番号` の行から次の `=== ` 行までが1件の行コメントになる。行コメントがなければ、本文だけを渡す。`=== ` で始まるのに形式に合わない行があると、投稿せずにエラーで止まる。コードブロックの中の行は、区切り行として扱われない。スクリプトは `event` を `COMMENT` にして投稿し、レビューの URL を表示する。`--dry-run` を付けると、投稿せずに送る内容を表示する。
 
 ```bash
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/gh_driven.py" review N 〈headRefOid〉 <<'EOF'
@@ -142,9 +143,11 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/gh_driven.py" review N 〈headRefOid〉 <
 
 - G1 ![要修正](https://img.shields.io/badge/review-%E8%A6%81%E4%BF%AE%E6%AD%A3-red) 〈問題〉 → 〈解決の条件〉
 
-判定: FAIL(未解決: 要修正 1件、提案 2件)
+判定: FAIL(未解決: 要修正 1件、提案 3件)
 === src/example.ts:42
 ![gh-driven-reviewer](https://img.shields.io/badge/gh--driven-reviewer-blueviolet) ![提案](https://img.shields.io/badge/review-%E6%8F%90%E6%A1%88-blue) 〈問題〉 → 〈解決の条件〉
+=== src/example.ts:50-58
+![gh-driven-reviewer](https://img.shields.io/badge/gh--driven-reviewer-blueviolet) ![提案](https://img.shields.io/badge/review-%E6%8F%90%E6%A1%88-blue) 〈複数行にまたがる指摘〉 → 〈解決の条件〉
 === src/removed.ts:7 LEFT
 ![gh-driven-reviewer](https://img.shields.io/badge/gh--driven-reviewer-blueviolet) ![提案](https://img.shields.io/badge/review-%E6%8F%90%E6%A1%88-blue) 〈削除した行への指摘〉 → 〈解決の条件〉
 EOF

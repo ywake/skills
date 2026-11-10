@@ -14,19 +14,26 @@ review の入力の形式:
     レビュー本文(複数行可)
     === path/to/file.ts:42
     行コメントの本文(複数行可)
+    === path/to/file.ts:50-58
+    複数行にまたがる行コメントの本文
     === path/to/old.ts:7 LEFT
     削除した行への行コメントの本文
 
 最初の「=== 」行より前がレビュー本文。「=== パス:行番号」が行コメントの始まりで、
-行番号の後ろに LEFT を付けると削除した行(変更前の行番号)を指す。付けなければ RIGHT。
+「開始-終了」と書くと複数行の範囲を指す。行番号の後ろに LEFT を付けると削除した行
+(変更前の行番号)を指す。付けなければ RIGHT。
+「=== 」で始まるのに形式に合わない行は、エラーにして投稿しない。コードブロック(```)の
+中の行は、区切り行として扱わない。
 """
 import json
 import re
 import subprocess
 import sys
 
-# 行コメントの区切り行。「=== パス:行番号」に、任意で LEFT か RIGHT が続く
-HEADER = re.compile(r"^=== (?P<path>.+):(?P<line>\d+)(?: (?P<side>LEFT|RIGHT))?\s*$")
+# 行コメントの区切り行。「=== パス:行番号」か「=== パス:開始-終了」に、任意で LEFT か RIGHT が続く
+HEADER = re.compile(
+    r"^=== (?P<path>.+):(?:(?P<start>\d+)-)?(?P<line>\d+)(?: (?P<side>LEFT|RIGHT))?\s*$"
+)
 
 # スレッドを1ページ分取得するクエリ。cursor が null なら先頭から
 THREADS_QUERY = """
@@ -36,7 +43,7 @@ query($owner:String!,$repo:String!,$pr:Int!,$cursor:String){
       reviewThreads(first:100, after:$cursor){
         pageInfo{ hasNextPage endCursor }
         nodes{
-          id isResolved isOutdated path line
+          id isResolved isOutdated path startLine line
           comments(first:100){ nodes{ author{ login } createdAt body } }
         }
       }
@@ -86,26 +93,34 @@ def rest_all(endpoint):
 
 def parse(text):
     """review の入力を、レビュー本文と行コメントのリストに分ける。"""
-    body_lines, comments, current = [], [], None
-    for line in text.splitlines():
-        m = HEADER.match(line)
+    body_lines, comments, bodies, in_fence = [], [], [], False
+    for number, line in enumerate(text.splitlines(), 1):
+        # コードブロックの中では、区切り行を探さない(テストの出力などを引用できるように)
+        if line.lstrip().startswith("```"):
+            in_fence = not in_fence
+        m = None if in_fence else HEADER.match(line)
         if m:
             # 区切り行が来たら、新しい行コメントを始める
-            current = {
-                "path": m["path"],
-                "line": int(m["line"]),
-                "side": m["side"] or "RIGHT",
-                "body": [],
-            }
-            comments.append(current)
-        elif current is None:
+            side = m["side"] or "RIGHT"
+            comment = {"path": m["path"], "line": int(m["line"]), "side": side}
+            if m["start"]:
+                # 範囲のときは、開始行も渡す。開始が終了より後ろなら書き間違い
+                if int(m["start"]) >= int(m["line"]):
+                    sys.exit(f"入力の {number} 行目: 範囲の開始が終了より前にありません: {line}")
+                comment.update(start_line=int(m["start"]), start_side=side)
+            comments.append(comment)
+            bodies.append([])
+        elif not in_fence and line.startswith("=== "):
+            # 区切り行のつもりで形式を間違えた行を、本文に混ぜて投稿しない
+            sys.exit(f"入力の {number} 行目: 区切り行の形式に合いません: {line}")
+        elif not comments:
             # 最初の区切り行より前は、レビュー本文
             body_lines.append(line)
         else:
-            current["body"].append(line)
+            bodies[-1].append(line)
     # 行のリストを本文の文字列に戻す。前後の空行は落とす
-    for c in comments:
-        c["body"] = "\n".join(c["body"]).strip()
+    for comment, lines in zip(comments, bodies):
+        comment["body"] = "\n".join(lines).strip()
     return "\n".join(body_lines).strip(), comments
 
 
@@ -140,7 +155,7 @@ def show(pr):
         for t in page["nodes"]:
             threads.append({
                 "id": t["id"], "resolved": t["isResolved"], "outdated": t["isOutdated"],
-                "path": t["path"], "line": t["line"],
+                "path": t["path"], "start_line": t["startLine"], "line": t["line"],
                 "comments": [
                     {"user": (c["author"] or {}).get("login"), "created_at": c["createdAt"],
                      "body": c["body"]}
@@ -191,15 +206,25 @@ def comment(number):
 
 def selftest():
     """parse が本文と行コメントを正しく分けることを確かめる。"""
+    # 本文、1行の行コメント、範囲、LEFT、コードブロックの中の「=== 」
     body, comments = parse(
-        "本文 'q' \"d\"\n2行目\n=== src/a.ts:42\nc1\n続き\n=== src/b c.ts:7 LEFT\nc2\n"
+        "本文 'q' \"d\"\n2行目\n=== src/a.ts:42\nc1\n続き\n"
+        "=== src/b c.ts:5-7 LEFT\nc2\n```\n=== RUN TestX\n```\n"
     )
     assert body == "本文 'q' \"d\"\n2行目", body
     assert comments == [
         {"path": "src/a.ts", "line": 42, "side": "RIGHT", "body": "c1\n続き"},
-        {"path": "src/b c.ts", "line": 7, "side": "LEFT", "body": "c2"},
+        {"path": "src/b c.ts", "line": 7, "side": "LEFT", "start_line": 5, "start_side": "LEFT",
+         "body": "c2\n```\n=== RUN TestX\n```"},
     ], comments
     assert parse("本文だけ") == ("本文だけ", [])
+    # 形式に合わない区切り行と、逆向きの範囲は、エラーで止まる
+    for bad in ("本文\n=== src/a.ts\nc", "本文\n=== src/a.ts:9-3\nc"):
+        try:
+            parse(bad)
+        except SystemExit:
+            continue
+        raise AssertionError(f"エラーにならなかった: {bad!r}")
     print("ok")
 
 
