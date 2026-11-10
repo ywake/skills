@@ -74,13 +74,13 @@ gh skill update --all                            # まとめて更新
 
 | プラグイン | 用途 |
 | --- | --- |
-| [specgate](plugins/specgate/SKILL.md) | 仕様を issue にまとめ、独立したレビュー役サブエージェントによる仕様レビューとコードレビューを GitHub 上で通してから完了にする。`/specgate:specgate` で明示的に呼ぶ |
+| [gh-driven](plugins/gh-driven/SKILL.md) | GitHub の issue と PR だけを介して開発を進める。仕様を issue にまとめ、独立したレビュー役サブエージェントによる仕様レビューとコードレビューを GitHub 上で通してから完了にする。`/gh-driven:start` で明示的に呼ぶ |
 
 Claude Code のセッション内で、このリポジトリをマーケットプレイスとして登録してから入れる:
 
 ```
 /plugin marketplace add ywake/skills
-/plugin install specgate@ywake
+/plugin install gh-driven@ywake
 ```
 
 更新は `/plugin marketplace update ywake` で取り込む。

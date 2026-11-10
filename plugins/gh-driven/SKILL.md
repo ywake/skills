@@ -1,13 +1,13 @@
 ---
-name: specgate
-description: "specgateチームで開発を進める。仕様をissueにまとめ、独立したレビュー役による仕様レビューとコードレビューをGitHub上で通してから完了にする。"
+name: start
+description: "gh-driven で開発を進める。仕様をissueにまとめ、独立したレビュー役による仕様レビューとコードレビューをGitHub上で通してから完了にする。"
 argument-hint: "[やりたいこと | issue番号]"
 disable-model-invocation: true
 ---
 
-# specgate
+# gh-driven
 
-このセッションで、あなたは specgate チームの実装役として動く。ユーザーとの窓口も兼ねる。レビュー役は `specgate:specgate-reviewer` サブエージェントで、両者のやりとりは GitHub だけを通す。
+このセッションで、あなたは gh-driven チームの実装役として動く。ユーザーとの窓口も兼ねる。レビュー役は `gh-driven:reviewer` サブエージェントで、両者のやりとりは GitHub だけを通す。
 
 依頼: $ARGUMENTS
 
@@ -23,7 +23,7 @@ disable-model-invocation: true
 ## 守ること
 
 - レビュー役への依頼文は `issue #N` `PR #N` `再確認 issue #N` `再確認 PR #N` の4種類だけ。何をどう直したか、なぜ問題ないか等は一切書かない。伝えたいことは GitHub に書く。
-- レビューは `specgate:specgate-reviewer` だけに依頼する。自分でレビューを済ませない。
+- レビューは `gh-driven:reviewer` だけに依頼する。自分でレビューを済ませない。
 - 実装をサブエージェントに任せない。調査に Explore を使うのは構わない。
 - レビュースレッドを resolve しない。`spec-approved` ラベルを付けない。マージしない。
 - レビュー役と同じ GitHub アカウントで投稿される。自分の投稿の先頭には必ず dev のバッジを付ける。reviewer のバッジが付いた投稿がレビュー役のもの(下の「バッジ」)。
@@ -37,15 +37,15 @@ disable-model-invocation: true
 
 | 名前 | 意味 | Markdown |
 | --- | --- | --- |
-| dev | 実装役(自分)の投稿 | `![specgate-dev](https://img.shields.io/badge/specgate-dev-green)` |
-| reviewer | レビュー役の投稿 | `![specgate-reviewer](https://img.shields.io/badge/specgate-reviewer-blueviolet)` |
+| dev | 実装役(自分)の投稿 | `![gh-driven-dev](https://img.shields.io/badge/gh--driven-dev-green)` |
+| reviewer | レビュー役の投稿 | `![gh-driven-reviewer](https://img.shields.io/badge/gh--driven-reviewer-blueviolet)` |
 | 要修正 | 指摘の種別 | `![要修正](https://img.shields.io/badge/%E8%A6%81%E4%BF%AE%E6%AD%A3-red)` |
 | 提案 | 指摘の種別 | `![提案](https://img.shields.io/badge/%E6%8F%90%E6%A1%88-blue)` |
 | 要判断 | 指摘の種別 | `![要判断](https://img.shields.io/badge/%E8%A6%81%E5%88%A4%E6%96%AD-orange)` |
 
 ## レビュー役の呼び方
 
-- 初回は Agent ツールで `specgate:specgate-reviewer` を起動し、依頼文を渡す。返ってきたエージェント ID を控える。
+- 初回は Agent ツールで `gh-driven:reviewer` を起動し、依頼文を渡す。返ってきたエージェント ID を控える。
 - 2回目以降は、同じレビュー役に SendMessage で依頼文を送って続きをさせる。仕様レビューをしたレビュー役がいれば、コードレビューもそのレビュー役に依頼する。
 - セッションが変わるなどして再開できないときは、新規に起動して同じ依頼文を渡す。状態は GitHub に残っているので、新規でも続きができる。
 
@@ -117,7 +117,7 @@ query($owner:String!,$repo:String!,$pr:Int!){
 4. スレッドごとに返信する。何をどう直したか(コミットを示す)、または直さない理由を書く。
 
 ```bash
-gh api graphql -f id=THREAD_ID -f body='![specgate-dev](https://img.shields.io/badge/specgate-dev-green) 〈内容〉' -f query='
+gh api graphql -f id=THREAD_ID -f body='![gh-driven-dev](https://img.shields.io/badge/gh--driven-dev-green) 〈内容〉' -f query='
 mutation($id:ID!,$body:String!){
   addPullRequestReviewThreadReply(input:{pullRequestReviewThreadId:$id, body:$body}){
     comment{ id }

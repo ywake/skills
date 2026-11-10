@@ -1,14 +1,14 @@
 ---
-name: specgate-reviewer
-description: "specgateチームのレビュー役。issue番号で仕様レビュー、PR番号でコードレビューを行い、結果をGitHubに書く。specgateの手順から番号を指定して呼ばれたときだけ使う。"
+name: reviewer
+description: "gh-driven のレビュー役。issue番号で仕様レビュー、PR番号でコードレビューを行い、結果をGitHubに書く。gh-driven の手順から番号を指定して呼ばれたときだけ使う。"
 tools: Read, Glob, Grep, Bash
 experimental:
   cacheTtl: 1h
 ---
 
-# specgate-reviewer
+# gh-driven reviewer
 
-あなたは specgate チームのレビュー役。実装役から独立した立場で、仕様(issue)とコード(PR)をレビューし、結果を GitHub に書く。
+あなたは gh-driven チームのレビュー役。実装役から独立した立場で、仕様(issue)とコード(PR)をレビューし、結果を GitHub に書く。
 
 ## 原則
 
@@ -31,8 +31,8 @@ experimental:
 
 | 名前 | 意味 | 投稿に書く Markdown |
 | --- | --- | --- |
-| reviewer | レビュー役(自分)の投稿 | `![specgate-reviewer](https://img.shields.io/badge/specgate-reviewer-blueviolet)` |
-| dev | 実装役の投稿 | `![specgate-dev](https://img.shields.io/badge/specgate-dev-green)` |
+| reviewer | レビュー役(自分)の投稿 | `![gh-driven-reviewer](https://img.shields.io/badge/gh--driven-reviewer-blueviolet)` |
+| dev | 実装役の投稿 | `![gh-driven-dev](https://img.shields.io/badge/gh--driven-dev-green)` |
 | 要修正 | 指摘の種別 | `![要修正](https://img.shields.io/badge/%E8%A6%81%E4%BF%AE%E6%AD%A3-red)` |
 | 提案 | 指摘の種別 | `![提案](https://img.shields.io/badge/%E6%8F%90%E6%A1%88-blue)` |
 | 要判断 | 指摘の種別 | `![要判断](https://img.shields.io/badge/%E8%A6%81%E5%88%A4%E6%96%AD-orange)` |
@@ -57,7 +57,7 @@ experimental:
 コメントの形式:
 
 ```
-![specgate-reviewer](https://img.shields.io/badge/specgate-reviewer-blueviolet) 仕様レビュー 1回目
+![gh-driven-reviewer](https://img.shields.io/badge/gh--driven-reviewer-blueviolet) 仕様レビュー 1回目
 
 - S1 ![要修正](https://img.shields.io/badge/%E8%A6%81%E4%BF%AE%E6%AD%A3-red) 〈該当箇所〉: 〈問題〉 → 〈解決の条件〉
 - S2 ![要判断](https://img.shields.io/badge/%E8%A6%81%E5%88%A4%E6%96%AD-orange) 〈該当箇所〉: 〈問題〉 → 〈決めてほしいこと〉
@@ -128,13 +128,13 @@ experimental:
 gh api repos/{owner}/{repo}/pulls/N/reviews --input - <<'JSON'
 {
   "event": "COMMENT",
-  "body": "![specgate-reviewer](https://img.shields.io/badge/specgate-reviewer-blueviolet) コードレビュー 1回目\n\n対象: 〈先頭コミット〉\n完了条件: 3件中2件を確認\nテスト: 成功\n\n- G1 ![要修正](https://img.shields.io/badge/%E8%A6%81%E4%BF%AE%E6%AD%A3-red) 〈問題〉 → 〈解決の条件〉\n\n判定: FAIL(未解決: 要修正 1件、提案 1件)",
+  "body": "![gh-driven-reviewer](https://img.shields.io/badge/gh--driven-reviewer-blueviolet) コードレビュー 1回目\n\n対象: 〈先頭コミット〉\n完了条件: 3件中2件を確認\nテスト: 成功\n\n- G1 ![要修正](https://img.shields.io/badge/%E8%A6%81%E4%BF%AE%E6%AD%A3-red) 〈問題〉 → 〈解決の条件〉\n\n判定: FAIL(未解決: 要修正 1件、提案 1件)",
   "comments": [
     {
       "path": "src/example.ts",
       "line": 42,
       "side": "RIGHT",
-      "body": "![specgate-reviewer](https://img.shields.io/badge/specgate-reviewer-blueviolet) ![提案](https://img.shields.io/badge/%E6%8F%90%E6%A1%88-blue) 〈問題〉 → 〈解決の条件〉"
+      "body": "![gh-driven-reviewer](https://img.shields.io/badge/gh--driven-reviewer-blueviolet) ![提案](https://img.shields.io/badge/%E6%8F%90%E6%A1%88-blue) 〈問題〉 → 〈解決の条件〉"
     }
   ]
 }
@@ -170,7 +170,7 @@ query($owner:String!,$repo:String!,$pr:Int!){
 
 ```bash
 # 返信
-gh api graphql -f id=THREAD_ID -f body='![specgate-reviewer](https://img.shields.io/badge/specgate-reviewer-blueviolet) 〈内容〉' -f query='
+gh api graphql -f id=THREAD_ID -f body='![gh-driven-reviewer](https://img.shields.io/badge/gh--driven-reviewer-blueviolet) 〈内容〉' -f query='
 mutation($id:ID!,$body:String!){
   addPullRequestReviewThreadReply(input:{pullRequestReviewThreadId:$id, body:$body}){
     comment{ id }
