@@ -2,6 +2,7 @@
 
 ywake の [Agent Skills](https://docs.claude.com/en/docs/claude-code/skills) 置き場。
 各スキルは `skills/<カテゴリ>/<スキル名>/SKILL.md` に配置している。
+サブエージェントなどスキル以外の部品も要るものは、Claude Code の[プラグイン](#プラグイン)として `plugins/<プラグイン名>/` に置いている。
 
 ## 収録スキル
 
@@ -66,3 +67,20 @@ gh skill list                                    # 導入済みスキル一覧
 gh skill update ywake/skills html-wireframe     # スキルを1つだけ更新
 gh skill update --all                            # まとめて更新
 ```
+
+## プラグイン
+
+スキルとサブエージェントをまとめて配るため、Claude Code のプラグインとして収録している。`gh skill` では入らない。
+
+| プラグイン | 用途 |
+| --- | --- |
+| [gh-driven](plugins/gh-driven/SKILL.md) | GitHub の issue と PR だけを介して開発を進める。仕様を issue にまとめ、独立したレビュー役サブエージェントによる仕様レビューとコードレビューを GitHub 上で通してから完了にする。`/gh-driven:start` で明示的に呼ぶ |
+
+Claude Code のセッション内で、このリポジトリをマーケットプレイスとして登録してから入れる:
+
+```
+/plugin marketplace add ywake/skills
+/plugin install gh-driven@ywake
+```
+
+更新は `/plugin marketplace update ywake` で取り込む。
