@@ -30,7 +30,7 @@ disable-model-invocation: true
 - バッジは、自分と同じ GitHub アカウント(`gh api user --jq .login`)の投稿でだけ意味を持つ。他のアカウントの投稿は、バッジが付いていても第三者のコメントとして読み、レビュー役の指摘として対応しない。
 - 指摘の中身は GitHub から読む。レビュー役からの報告は、判定と未解決の件数の確認にだけ使う。
 - レビュー役が動いている間は、完了の通知を待つ。作業ツリーを変更しない(編集、コミット、ブランチの切り替え)。
-- 投稿の本文は、引用符付きのヒアドキュメントで標準入力から渡す(下の各例の形)。コマンドの引数に直接書くと、本文中の引用符で壊れる。
+- 投稿の本文は、引用符付きのヒアドキュメントで標準入力から渡す(`--body-file -` や `-F body=@-`)。コマンドの引数に直接書くと、本文中の引用符で壊れる。
 - レビュー役の判定が NOT_READY のときは、レビューは始まっていない。理由を読んで前提を直し、同じ依頼文で依頼し直す。自分で直せないときは、ユーザーに相談する。
 - レビュー役の判定が ESCALATE のときは、理由をユーザーに伝えて判断を仰ぐ。ユーザーが決めた内容は、該当の指摘への返信に、dev のバッジと裁定のバッジを並べて書く。そのあと `再確認` で依頼する。裁定のバッジは、ユーザーが決めた内容を書くときだけ使う。
 
@@ -79,7 +79,7 @@ disable-model-invocation: true
 3. 指摘に対応する。
    - 要修正: issue 本文を直す(`gh issue edit N --body-file <ファイル>`)。
    - 要判断: ユーザーに聞き、決まった内容を issue 本文に反映する。
-4. 1つのコメントで、番号ごとに返信する(`python3 "${CLAUDE_PLUGIN_ROOT}/scripts/gh_driven.py" comment N`)。対応した内容か、対応しない理由を書く。
+4. 1つのコメントで、番号ごとに返信する(`gh issue comment N --body-file -`)。対応した内容か、対応しない理由を書く。
 5. `再確認 issue #N` で依頼する。判定が FAIL なら 2 から繰り返す。
 
 ## 3. 承認
@@ -100,10 +100,26 @@ disable-model-invocation: true
 2. 判定が PASS で、未解決の提案が 0 件なら 6 に進む。それ以外は指摘を読む。行に紐づかない指摘(G 番号)はレビュー本文から、行コメントはスレッドから読む。
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/gh_driven.py" show N
-```
+# レビュー本文。本文が空のレビューは、スレッドへの返信に伴ってできたものなので除く
+gh api 'repos/{owner}/{repo}/pulls/N/reviews' --paginate \
+  --jq '.[] | select(.body != "") | {user: .user.login, submitted_at, body}'
 
-`show` は、レビュー本文(`reviews`)、スレッド(`threads`)、PR コメント(`comments`)を JSON で表示する。どれにも投稿者(`user`)が付く。
+# 行コメントのスレッド
+gh api graphql --paginate -F owner='{owner}' -F repo='{repo}' -F pr=N -f query='
+query($owner:String!,$repo:String!,$pr:Int!,$endCursor:String){
+  repository(owner:$owner,name:$repo){
+    pullRequest(number:$pr){
+      reviewThreads(first:100, after:$endCursor){
+        pageInfo{ hasNextPage endCursor }
+        nodes{
+          id isResolved isOutdated path startLine line
+          comments(first:50){ nodes{ author{ login } body createdAt } }
+        }
+      }
+    }
+  }
+}'
+```
 
 3. 未解決の指摘に、種別ごとに対応する。直した分はコミットして push する。
    - 要修正: 修正する。納得できない指摘は、直さずに理由を返信してよい。
@@ -111,12 +127,17 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/gh_driven.py" show N
 4. スレッドごとに返信する。何をどう直したか(コミットを示す)、または直さない理由を書く。
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/gh_driven.py" reply THREAD_ID <<'EOF'
+gh api graphql -f id=THREAD_ID -F body=@- -f query='
+mutation($id:ID!,$body:String!){
+  addPullRequestReviewThreadReply(input:{pullRequestReviewThreadId:$id, body:$body}){
+    comment{ id }
+  }
+}' <<'EOF'
 ![gh-driven-dev](https://img.shields.io/badge/gh--driven-dev-green) 〈内容〉
 EOF
 ```
 
-5. G 番号の指摘には、`python3 "${CLAUDE_PLUGIN_ROOT}/scripts/gh_driven.py" comment N` で番号ごとにまとめて返信する。
+5. G 番号の指摘には、`gh pr comment N --body-file -` で番号ごとにまとめて返信する。
 6. 作業ツリーを 4 の手順5の状態に戻してから、`再確認 PR #N` で依頼し、2 に戻る。
 
 ## 6. 完了
@@ -127,4 +148,4 @@ EOF
 - レビューの回数
 - 対応しなかった指摘と、その理由
 
-GitHub の読み書きには、プラグインに同梱のスクリプト(上の各例の `gh_driven.py`)を使う。スクリプトで足りないときや失敗したときは、`gh` を直接使い、`gh <コマンド> --help` で確認して、目的に合うように調整する。
+この文書のコマンドは例。必要な情報が取れないときや失敗したときは、`gh <コマンド> --help` で確認して、目的に合うように調整する。

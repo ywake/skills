@@ -84,5 +84,3 @@ Claude Code のセッション内で、このリポジトリをマーケット�
 ```
 
 更新は `/plugin marketplace update ywake` で取り込む。
-
-必要なコマンドは `gh` と `python3`（GitHub の読み書きに使う。標準ライブラリだけで動く）。
