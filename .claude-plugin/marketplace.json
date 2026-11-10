@@ -1,0 +1,14 @@
+{
+  "name": "ywake",
+  "owner": {
+    "name": "ywake"
+  },
+  "description": "ywake の Claude Code プラグイン置き場",
+  "plugins": [
+    {
+      "name": "specgate",
+      "source": "./plugins/specgate",
+      "description": "仕様を issue にまとめ、独立したレビュー役サブエージェントによる仕様レビューとコードレビューを GitHub 上で通してから完了にする"
+    }
+  ]
+}
