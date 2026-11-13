@@ -47,9 +47,12 @@ experimental:
 依頼を受けたら、ファイルやブランチを変える前に、次の手順で作業場所を整える。質問に答える依頼(`質問(PR #L の担当から):`)だけは、何も変えずに答えるので、この手順を省く。
 
 1. `git rev-parse --show-toplevel` の結果が `/.claude/worktrees/agent-` を含むことを確かめる。含まなければ、何も変更せずに BLOCKED で報告する(止まっている間に worktree が消えて、別の場所で再開されたとき)。最初の依頼なら、このパスを自分の worktree として覚える。以後の依頼では、覚えたパスと一致することも確かめる。
-2. PR のブランチを決める。PR があれば `gh pr view M --json headRefName` の値、依頼文に `ブランチ:` があればその値。どちらもなければ、まだブランチがないので、A の手順2で切る(ここで手順を終える)。
+2. PR のブランチを決める。PR があれば `gh pr view M --json headRefName` の値、依頼文に `ブランチ:` があればその値。どちらもなければ(`実装` の最初の依頼)、ここで PR のブランチを切り、手順3を省いて手順4に進む。ブランチ名はリポジトリの慣習に従う。慣習がなければ `<N>-<短い英語の名前>` にする。`--no-track` を付け、upstream を土台のブランチにしない。
+   - 土台の PR があり、まだマージされていない: `git fetch origin` のあと `git switch -c <ブランチ> --no-track origin/<土台の PR のブランチ>`。
+   - 土台がない、または土台の PR がマージ済み: `git fetch origin` のあと `git switch -c <ブランチ> --no-track origin/<仕様の PR 計画のベースブランチ>`。
+   - PR を積むツール(gh stack など)をリポジトリが使っていれば、そのツールで切る。
 3. いまのブランチ(`git branch --show-current`)が PR のブランチなら、整っている。違えば(引き継いだとき、頼み直されたとき)、PR のブランチに移る。
-   - `git worktree list` で、PR のブランチを持つ別の worktree を探す。見つかり、未コミットの変更がなければ(`git -C <その worktree> status --porcelain` が空)、`git worktree remove <その worktree>` で外し、その worktree の起動時のブランチ `worktree-agent-<id>` を `git branch -D` で消す。未コミットの変更があれば、何も変えずに BLOCKED で報告する。理由に、その worktree のパスを書く。
+   - `git worktree list` で、PR のブランチを持つ別の worktree を探す。外してよいのは、パスが `/.claude/worktrees/agent-` を含む実装役の worktree で、未コミットの変更がない(`git -C <その worktree> status --porcelain` が空)ものだけ。そのときは `git worktree remove <その worktree>` で外し、その worktree の起動時のブランチ `worktree-agent-<id>` を `git branch -D` で消す。それ以外(未コミットの変更がある、利用者の worktree、本体の作業ツリー)なら、何も変えずに BLOCKED で報告する。理由に、その worktree のパスを書く。
    - `git fetch origin` のあと、`git switch <ブランチ>` で移る。ローカルになくリモートにだけあれば、`git switch -c <ブランチ> --track origin/<ブランチ>` で移る。どちらにもなければ BLOCKED で報告する。
 4. 最初の依頼なら、テストを動かす準備をする。依存のインストールは、リポジトリの README や CLAUDE.md の手順に従う。テストに要る、gitignore されたファイル(`.env` など)が worktree にないときは、本体リポジトリの作業ツリー(`git worktree list` の1行目)からコピーしてよい。gitignore されたファイルはコミットに入れない。
 
@@ -75,12 +78,9 @@ experimental:
 ## A. 実装(`実装 #N の PR 計画 k`)
 
 1. `gh issue view N --comments` で issue を読み、仕様を特定する(原則の節)。仕様の PR 計画のベースブランチ、項目 k の内容、土台、担う完了条件、`Closes` を持つか、仕様の「やらないこと」を確かめる。
-2. 作業場所を整える(上の節)。PR のブランチがまだなければ、切る。ブランチ名はリポジトリの慣習に従う。慣習がなければ `<N>-<短い英語の名前>` にする。`--no-track` を付け、upstream を土台のブランチにしない。
-   - 土台の PR があり、まだマージされていない: `git fetch origin` のあと `git switch -c <ブランチ> --no-track origin/<土台の PR のブランチ>`。
-   - 土台がない、または土台の PR がマージ済み: `git fetch origin` のあと `git switch -c <ブランチ> --no-track origin/<PR 計画のベースブランチ>`。
-   - PR を積むツール(gh stack など)をリポジトリが使っていれば、そのツールで切る。
+2. 作業場所を整える(上の節)。PR のブランチがまだなければ、そこで切る。仕様の PR 計画に `ベースブランチ:` の行がなければ、何も変えずに BLOCKED で報告する(仕様はメインが直す)。
 3. 担う完了条件に沿って実装し、テストを書いて通す。lint があれば通す。担当外の完了条件と、やらないことに手を出さない。
-4. コミットして `git push -u origin <ブランチ>` で push し、PR を作る。ベースは、手順2で切った元のブランチ。本文には次を書く。
+4. コミットして `git push -u origin <ブランチ>` で push し、PR を作る。ベースは、ブランチを切った元のブランチ。本文には次を書く。
    - 1行目: `仕様: #N の PR 計画 k`
    - 2行目: `土台: PR #L`(土台がなければ `土台: なし`)。追従(C)は、この行で土台を知る。
    - 項目が `Closes` を持つなら `Closes #N`、持たないなら `Refs #N`
@@ -136,9 +136,12 @@ EOF
 ## C. 土台への追従(`追従 PR #M`)
 
 1. 作業場所を整える。
-2. PR 本文の `土台: PR #L` の行で、土台の PR を知る。`gh pr view L --json state,headRefName,headRefOid` で、土台の状態を確かめる。`gh issue view N --comments` で、仕様の PR 計画のベースブランチを確かめる。
+2. PR 本文の `土台:` の行で、土台の PR を知る。
+   - `土台: なし`: 追従するものはない。何も変えずに DONE を報告する。
+   - 行がない(この決まりより前に作った PR): 仕様の PR 計画で項目 k の土台の項目を確かめ、本文に `仕様: #N の PR 計画 <土台の項目>` を持つ PR を探して、その番号で `土台:` の行を本文に足してから続ける(`gh pr edit M --body-file -`)。
+   - `土台: PR #L`: `gh pr view L --json state,headRefName,headRefOid,baseRefName` で、土台の状態を確かめる。`gh issue view N --comments` で、仕様の PR 計画のベースブランチを確かめる。行がなければ、何も変えずに BLOCKED で報告する。
 3. 新しい土台と、古い土台を決める。
-   - 新しい土台: 土台の PR がまだマージされていなければ `origin/<土台の PR のブランチ>`。マージ済みなら `origin/<PR 計画のベースブランチ>`。
+   - 新しい土台: 土台の PR がまだマージされていなければ `origin/<土台の PR のブランチ>`。マージ済みなら `origin/<PR 計画のベースブランチ>`。ただし、マージ済みの土台の `baseRefName` がベースブランチと違う(土台が、さらに下の PR のブランチにマージされた)ときは、何も変えずに BLOCKED で報告する。そのまま付け替えると、土台に入った変更を失う。
    - 古い土台(いまの PR のコミットが乗っている点): `git merge-base --fork-point origin/<土台の PR のブランチ> HEAD`。結果が空なら、土台の PR の `headRefOid` が HEAD の祖先であればそれを使う(`git merge-base --is-ancestor <headRefOid> HEAD`)。どちらでも決まらなければ、BLOCKED で報告する。
    - `git fetch origin` は、古い土台を決めたあとに行う。
 4. 土台の PR がマージ済みなら、PR のベースをベースブランチに付け替える(`gh pr edit M --base <ベースブランチ>`)。GitHub やリポジトリのツールが付け替え済みなら、付け替えは要らない。
