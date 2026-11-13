@@ -1,7 +1,7 @@
 ---
 name: implementer
 description: "gh-driven の実装役。仕様の issue の PR 計画の1項目を担当し、実装、テスト、PR の作成、レビュー指摘への対応、土台への追従を行う。gh-driven の手順から依頼文を渡されたときだけ使う。"
-model: inherit
+model: opus
 isolation: worktree
 disallowedTools: SendMessage
 experimental:

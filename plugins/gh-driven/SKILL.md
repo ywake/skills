@@ -62,7 +62,7 @@ disable-model-invocation: true
 
 ## 実装役の呼び方
 
-- PR 計画の項目ごとに、Agent ツールで `gh-driven:implementer` を新しく起動する。1人の実装役を、複数の PR に使い回さない。`effort` は渡さない。`model` は、ユーザーが実装役のモデルを指示したときだけ、以後に起動するすべての実装役(引き継ぎを含む)に渡す。渡さなければ、実装役は自分と同じモデルで動く。
+- PR 計画の項目ごとに、Agent ツールで `gh-driven:implementer` を新しく起動する。1人の実装役を、複数の PR に使い回さない。`effort` は渡さない。`model` は、ユーザーが実装役のモデルを指示したときだけ、以後に起動するすべての実装役(引き継ぎを含む)に渡す。渡さなければ、実装役は Opus で動く(implementer.md の `model: opus`)。
 - 実装役は、自分専用の git worktree で動く(implementer.md の frontmatter に `isolation: worktree` がある)。worktree は、本体リポジトリの `.claude/worktrees/agent-<id>` にでき、デフォルトブランチから切られた起動時のブランチ `worktree-agent-<id>` にいる。作業場所について、実装役は次の決まりで動く(手順は implementer.md)。
   - 最初の依頼で、自分の worktree に、土台の PR のブランチから PR のブランチを切る。土台がない、または土台がマージ済みなら、ベースブランチから切る。
   - 依頼を受けるたびに、作業場所が自分の worktree で PR のブランチにいることを確かめ、違えば何も変えずに BLOCKED を返す。
