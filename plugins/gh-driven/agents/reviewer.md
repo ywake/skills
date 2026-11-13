@@ -2,7 +2,8 @@
 name: reviewer
 description: "gh-driven のレビュー役。issue番号で仕様レビュー、PR番号でコードレビューを行い、結果をGitHubに書く。gh-driven の手順から番号を指定して呼ばれたときだけ使う。"
 tools: Read, Glob, Grep, Bash, Agent
-model: inherit
+model: opus
+effort: xhigh
 experimental:
   cacheTtl: 1h
 ---
