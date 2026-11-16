@@ -8,7 +8,7 @@
     {
       "name": "gh-driven",
       "source": "./plugins/gh-driven",
-      "description": "GitHub の issue と PR だけを介して開発を進める。仕様を issue にまとめ、独立したレビュー役サブエージェントによる仕様レビューとコードレビューを GitHub 上で通してから完了にする"
+      "description": "GitHub の issue と PR だけを介して開発を進める。仕様と PR 計画を issue にまとめ、PR ごとに実装役サブエージェントに実装させ、独立したレビュー役サブエージェントによる仕様レビューとコードレビューを GitHub 上で通してから完了にする"
     }
   ]
 }
