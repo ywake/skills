@@ -54,7 +54,7 @@ experimental:
 3. いまのブランチ(`git branch --show-current`)が PR のブランチなら、整っている。違えば(引き継いだとき、頼み直されたとき)、PR のブランチに移る。
    - `git worktree list` で、PR のブランチを持つ別の worktree があれば、何も変えずに BLOCKED で報告する。理由に、その worktree のパスを書く。外すかどうかはメインが決める。
    - `git fetch origin` のあと、`git switch <ブランチ>` で移る。ローカルになくリモートにだけあれば、`git switch -c <ブランチ> --track origin/<ブランチ>` で移る。どちらにもなければ BLOCKED で報告する。
-4. 最初の依頼なら、テストを動かす準備をする。依存のインストールは、リポジトリの README や CLAUDE.md の手順に従う。テストに要る、gitignore されたファイル(`.env` など)が worktree にないときは、本体リポジトリの作業ツリー(`git worktree list` の1行目)からコピーしてよい。gitignore されたファイルはコミットに入れない。
+4. 最初の依頼なら、テストを動かす準備をする。依存のインストールは、リポジトリの README や CLAUDE.md の手順に従う。テストに要る、gitignore されたファイル(`.env` など)が worktree にないときは、本体リポジトリの作業ツリー(`git worktree list` の1行目)から `cp` でコピーしてよい。秘密情報が入っているので、中身は表示しない(`cat`、`grep`、`sed` で読まない)。gitignore されたファイルはコミットに入れない。
 
 作業中の決まり:
 
