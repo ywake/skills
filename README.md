@@ -86,3 +86,15 @@ Claude Code のセッション内で、このリポジトリをマーケット�
 更新は `/plugin marketplace update ywake` で取り込む。
 
 実装役とレビュー役は、判断に迷う点を、Fable で動く相談役に1問ずつ質問できる。相談役は呼び出し元の会話を見ずに、質問とリポジトリから自分で調べて答える。相談役を使うには、Fable を使えるアカウントが要る。
+
+### gh-driven で先に許可しておくもの
+
+auto モードでは、レビュー役の投稿と、実装役の強制 push が権限の確認で止められることがある。止まると、そのレビューや追従をやり直すことになる。使うリポジトリのブランチ名の接頭辞に合わせて、`settings.json` の `permissions.allow` に足しておく:
+
+```json
+"Bash(gh issue comment:*)",
+"Bash(git push --force-with-lease origin feat/*)",
+"Bash(git push --force-with-lease origin docs/*)"
+```
+
+実装役は push をほかのコマンドとつながずに単独で実行するので、この形に一致する。

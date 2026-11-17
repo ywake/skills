@@ -19,7 +19,7 @@ experimental:
 - 担当する項目の内容と担う完了条件、仕様の「やらないこと」に従う。仕様に書かれていないことを推測で決めない。
 - 仕様を変える必要が出たら、実装を止めて BLOCKED で報告する。仕様はメインが直す。
 - 別の PR の担当に「なぜそう書いたか」を聞きたいときは、作業を止めて QUESTION で報告する。メインが取り次ぐ。宛先が作業中なら、メインはその作業が終わってから聞く。返ってきた答えは手がかりとして扱い、コードで確かめてから使う。宛先を再開できない旨が返ってきたら、GitHub とコードから調べるか、相談役に聞いて続ける。
-- ブランチを動かす(コミット、rebase、push)のは、担当の PR のブランチだけ。ほかの worktree とブランチには触らない(「作業場所」の手順3で、古い worktree を外すときを除く)。
+- ブランチを動かす(コミット、rebase、push)のは、担当の PR のブランチだけ。ほかの worktree とブランチには触らない。worktree を外すのはメインの仕事。
 - マージしない。レビュースレッドを resolve しない。issue の本文と仕様コメントを書き換えない。
 - 今後も効く決定(設計判断、規約、ドメインのルール)が実装中に出たら、同じ PR でドキュメントや CLAUDE.md に反映する。
 - レビュー役と同じ GitHub アカウントで投稿される。自分の投稿の先頭には必ず dev のバッジ `![gh-driven-dev](https://img.shields.io/badge/gh--driven-dev-green)` を付ける。reviewer のバッジが付いた投稿がレビュー役のもの。バッジは、自分と同じ GitHub アカウント(`gh api user --jq .login`)の投稿でだけ意味を持つ。
@@ -52,7 +52,7 @@ experimental:
    - 土台がない、または土台の PR がマージ済み: `git fetch origin` のあと `git switch -c <ブランチ> --no-track origin/<仕様の PR 計画のベースブランチ>`。
    - PR を積むツール(gh stack など)をリポジトリが使っていれば、そのツールで切る。
 3. いまのブランチ(`git branch --show-current`)が PR のブランチなら、整っている。違えば(引き継いだとき、頼み直されたとき)、PR のブランチに移る。
-   - `git worktree list` で、PR のブランチを持つ別の worktree を探す。外してよいのは、パスが `/.claude/worktrees/agent-` を含む実装役の worktree で、未コミットの変更がない(`git -C <その worktree> status --porcelain` が空)ものだけ。そのときは `git worktree remove <その worktree>` で外し、その worktree の起動時のブランチ `worktree-agent-<id>` を `git branch -D` で消す。それ以外(未コミットの変更がある、利用者の worktree、本体の作業ツリー)なら、何も変えずに BLOCKED で報告する。理由に、その worktree のパスを書く。
+   - `git worktree list` で、PR のブランチを持つ別の worktree があれば、何も変えずに BLOCKED で報告する。理由に、その worktree のパスを書く。外すかどうかはメインが決める。
    - `git fetch origin` のあと、`git switch <ブランチ>` で移る。ローカルになくリモートにだけあれば、`git switch -c <ブランチ> --track origin/<ブランチ>` で移る。どちらにもなければ BLOCKED で報告する。
 4. 最初の依頼なら、テストを動かす準備をする。依存のインストールは、リポジトリの README や CLAUDE.md の手順に従う。テストに要る、gitignore されたファイル(`.env` など)が worktree にないときは、本体リポジトリの作業ツリー(`git worktree list` の1行目)からコピーしてよい。gitignore されたファイルはコミットに入れない。
 
@@ -60,6 +60,7 @@ experimental:
 
 - 報告の前に、作業中の変更をコミットする。何もコミットせずに止まると worktree が消える。push 前のコミットは、あとでまとめ直してよい。
 - push は、いつも PR のブランチを明示する(`git push -u origin <ブランチ>`、強制するときは `git push --force-with-lease origin <ブランチ>`)。引数なしの `git push` は、upstream の設定次第で別のブランチを書き換えるので使わない。
+- push は、ほかのコマンドとつながずに単独で実行する(`cd`、`-C`、`&&`、`;`、パイプを付けない)。作業場所は自分の worktree なので、`-C` は要らない。許可の規則は、コマンドの全体が規則の形に合うときだけ効く。
 - DONE の報告では、worktree を、PR のブランチの先頭と一致させ、未コミットの変更がない状態にする。レビュー役は、この worktree でテストを実行する。メインは、レビュー中の PR の担当に、worktree を変える依頼を送らない。
 
 ## 依頼文
@@ -164,7 +165,7 @@ EOF
 
 前の担当を再開できなくなったので、あなたが PR #M の担当になる。PR #M はまだマージされていない。
 
-1. 作業場所を整える(上の節)。手順3で、前の担当の worktree を外して、PR のブランチに移る。
+1. 作業場所を整える(上の節)。前の担当の worktree はメインが外してあるので、手順3で PR のブランチに移る。
 2. issue、PR、コミット、レビュースレッドを読んで、状態を把握する。
 3. 依頼文に続けて頼まれた作業(指摘への対応など)があれば、その節の手順で行う。なければ DONE を報告する。
 
