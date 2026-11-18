@@ -171,7 +171,7 @@ git grep -n '<語>' <headRefOid> -- <パス>   # 呼び出し側などを探す
 }
 ```
 
-- `line` は PR の先頭のファイルでの行番号で、diff に含まれる行に限る。範囲に付けるときは `start_line` を足す。
+- `line` は PR の先頭のファイルでの行番号で、diff に含まれる行に限る。diff に含まれない行が1つでもあると、レビュー全体が `Line could not be resolved` で断られる。範囲に付けるときは `start_line` を足す。
 - 削除された行に付けるときは、`side` を `LEFT` にし、変更前のファイルでの行番号を使う。
 - diff に含まれない行への指摘は、パスと行を書いて `body` に入れる。
 
@@ -191,7 +191,7 @@ git grep -n '<語>' <headRefOid> -- <パス>   # 呼び出し側などを探す
 
 4. 返ってきた URL を伝える。
 
-`REQUEST_CHANGES` と `COMMENT` は `body` が空だと送れない。自分が作った PR には `APPROVE` と `REQUEST_CHANGES` を送れない。
+`COMMENT` は、行へのコメントが1件もなく `body` も空だと送れない。`REQUEST_CHANGES` を送るときは `body` を書く。自分が作った PR には `APPROVE` と `REQUEST_CHANGES` を送れない。
 
 ## 発言の例
 
