@@ -17,7 +17,7 @@ ywake の [Agent Skills](https://docs.claude.com/en/docs/claude-code/skills) 置
 | [git-commit](skills/dev/git-commit/SKILL.md) | コミット作成用 |
 | [pr-digest](skills/dev/pr-digest/SKILL.md) | PR の diff を関心ごとに分解し、周辺コードの引用・意図の復元・確認点を添えたレポートを作り、レビューをレポートだけで判断できる状態にする |
 | [gh-stack](skills/dev/gh-stack/SKILL.md) | `gh stack` で Stacked PRs を作る・積み直す・マージする。非対話のエージェントが詰まる点とフラグ付きの実行形をまとめ、毎回 `--help` を引かずに済むようにする |
-| [pr-walkthrough](skills/dev/pr-walkthrough/SKILL.md) | レビュー担当者と会話しながら、PR を目的、機能、設計、構造、細部の順に見ていく。出す情報を段階ごとに絞り、指摘や質問は最後にまとめて PR へのレビューとして出す |
+| [pr-walkthrough](skills/dev/pr-walkthrough/SKILL.md) | レビュー担当者と会話しながら、PR を目的、機能、設計、構造、細部の順に見ていく。出す情報を段階ごとに絞り、指摘や質問は最後にまとめて PR へのレビューとして出す。`/pr-walkthrough` で明示的に呼ぶ |
 
 ## インストール
 
